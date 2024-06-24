@@ -1,24 +1,24 @@
-import React, { useCallback, memo, useState, useMemo, useEffect, Fragment } from 'react'
+import React, { useCallback, memo, useState, useMemo, useEffect } from 'react'
 import { Box } from '@mui/joy'
 import { Paper } from '@mui/material'
 import Typography from '@mui/joy/Typography'
-import SalutationDropDown from '../../../Components/SalutationDropDown'
 import CustomInput from '../../../Components/CustomInput'
 import Button from '@mui/material/Button';
 import { axioslogin } from '../../../AxiosConfig/Axios'
 import { ToastContainer } from 'react-toastify'
 import { succesNotify, warningNotify } from '../../../Components/CommonCode'
-import { differenceInCalendarDays, format } from 'date-fns'
-import SpecialityDropDown from '../../../Components/SpecialityDropDown'
-import DoctorDropDownBySepciality from '../../../Components/DoctorDropDownBySepciality'
+import { format } from 'date-fns'
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CusIconButton from '../../../Components/CusIconButton';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ProcedureDropDown from '../../../Components/ProcedureDropDown'
+import { CssVarsProvider } from '@mui/joy/'
+import Table from '@mui/joy/Table';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ShowPrint from './ShowPrint'
 
 const Billing = () => {
-
-
     const [pateintid, setPatientId] = useState('')
 
     const [patient, setPatient] = useState({
@@ -42,8 +42,30 @@ const Billing = () => {
         setPatientId(e.target.value)
     }, [])
 
-
-
+    const [procedure, setProcedure] = useState(0)
+    const [produrname, setProcedrName] = useState('')
+    const [rate, setRate] = useState(0)
+    const [detlFlag, setDetlFlag] = useState(0)
+    const [dataPost, setdataPost] = useState([])
+    const [SlNo, setSlNo] = useState(1)
+    const [modalFlag, setModalFlag] = useState(false)
+    const [modal, setModal] = useState(0)
+    const [lastVisitId, setLastVisitId] = useState(0)
+    useEffect(() => {
+        const getProcdrDetail = async (procedure) => {
+            const result = await axioslogin.get(`/Billing/getProcedureNameRate/${procedure}`)
+            const { success, data } = result.data
+            if (success === 1) {
+                const { procedure_name, procedure_rate } = data[0]
+                setProcedrName(procedure_name)
+                setRate(procedure_rate)
+            } else {
+                setProcedrName('')
+                setRate(0)
+            }
+        }
+        getProcdrDetail(procedure)
+    }, [procedure])
 
     const search = useCallback(() => {
         const getPatientDetails = async (pateintid) => {
@@ -104,26 +126,118 @@ const Billing = () => {
             patient_age: '',
             patient_month: '',
             patient_day: ''
-
         }
-
         setPatient(resetfrmdata)
-
-
+        setProcedure(0)
+        setProcedrName('')
+        setRate(0)
+        setDetlFlag(0)
+        setdataPost([])
+        setSlNo(1)
+        setModalFlag(false)
+        setModal(0)
+        setLastVisitId(0)
     }, [])
-
 
     const referesh = useCallback(() => {
         reset()
     }, [reset])
 
 
+    const AddProcedure = useCallback(() => {
+        if (procedure === 0) {
+            warningNotify("Please Select Any Procedure")
+        } else {
+            const newData = {
+                id: Math.ceil(Math.random() * 1000),
+                slno: SlNo,
+                procedure: procedure,
+                procedureName: produrname,
+                procedureRate: rate,
+                status: 1
+            }
+
+            const datass = [...dataPost, newData]
+
+            if (datass.length !== 0) {
+                setdataPost(datass)
+                setProcedure(0)
+                setSlNo(SlNo + 1)
+            }
+            setDetlFlag(1)
+        }
+
+    }, [procedure, produrname, produrname, rate])
+
+    let sumProcedureRate = dataPost.reduce((sum, obj) => sum + obj.procedureRate, 0);
+
+    const rowSelect = useCallback((val) => {
+        const { slno } = val
+        const xx = dataPost?.filter((val) => val.slno !== slno)
+        setdataPost(xx)
+    }, [dataPost])
+
+    const postData = useMemo(() => {
+        return {
+            patient_id: pateintid,
+            bill_date: format(new Date(), "yyyy-MM-dd hh:mm:ss"),
+            bill_amount: sumProcedureRate
+        }
+    }, [pateintid, sumProcedureRate])
+
+    const submit = useCallback(() => {
+        const insertBillMast = async (postVisitMast) => {
+            const result = await axioslogin.post('/Billing/insert', postVisitMast);
+            return result.data
+        }
+
+        const InserBillndetl = async (insertid) => {
+            const postdataDetl = dataPost && dataPost.map((val, index) => {
+                return {
+                    bill_slno: insertid,
+                    procedure_slno: val.procedure,
+                    procedure_rate: val.procedureRate,
+                    bill_proc_slno: index + 1
+                }
+            })
+            const result = await axioslogin.post('/Billing/BillDetailsInsert', postdataDetl);
+            const { success, message } = result.data
+            if (success === 1) {
+                succesNotify(message)
+                setModal(1)
+                setModalFlag(true)
+            } else {
+                warningNotify(message)
+            }
+        }
+        if (pateintid !== '') {
+            if (dataPost.length !== 0) {
+                insertBillMast(postData).then((val) => {
+                    const { success, message, insetid } = val
+                    if (success === 1) {
+                        InserBillndetl(insetid)
+                        setLastVisitId(insetid)
+                    } else {
+                        warningNotify(message)
+                    }
+
+                })
+            }
+            else {
+                warningNotify("Please Select Any Procedure")
+            }
+        } else {
+            warningNotify("Patient Id Not Valid, Plase Enter ")
+        }
 
 
-
+    }, [postData, dataPost, pateintid])
 
     return (
         <Box sx={{ width: "100%", p: 5 }}>
+
+            {modal === 1 ? <ShowPrint open={modalFlag} lastVisitId={lastVisitId} reset={reset}
+                patient={patient} pateintid={pateintid} sumProcedureRate={sumProcedureRate} /> : null}
             <ToastContainer />
             <Paper sx={{
                 width: '100%',
@@ -309,12 +423,96 @@ const Billing = () => {
                             </Box>
                         </Box>
 
+                        <Box>
+                            <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
+                                <Box sx={{ width: "15%", pt: 0.5, }}>
+                                </Box>
+                                <Box sx={{ width: "25%", pt: 0.5, }}>
+                                    <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, pl: 8 }} >Select Procedure</Typography>
+                                </Box>
+                                <Box sx={{ width: "25%", pt: 0.5, }}>
+                                    <ProcedureDropDown procedure={procedure} setProcedure={setProcedure} />
+                                </Box>
+                                <Box sx={{ width: "25%", pt: 0.5, pl: 2 }}>
+                                    <CusIconButton size="sm" variant="outlined" clickable="true" color="primary" onClick={AddProcedure} >
+                                        <AddCircleOutlineIcon fontSize='small' />
+                                    </CusIconButton>
+                                </Box>
+
+                            </Box>
 
 
+                        </Box>
+                        {
+                            detlFlag === 1 ?
+                                <Box>
+                                    <Box sx={{ border: 0.5 }}>
+                                        <CssVarsProvider>
+                                            <Table stickyHeader>
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{ width: '20%', align: "center" }}>Sl No</th>
+                                                        <th style={{ width: '60%', align: "center" }}>Procedure Name</th>
+                                                        <th style={{ width: '60%', align: "center" }}>Procedure Rate</th>
+                                                        <th style={{ width: '10%', align: "center" }}>Delete</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {dataPost && dataPost.map((val, index) => {
+                                                        return <tr
+                                                            key={index}
+                                                            sx={{
+                                                                '&:last-child td, &:last-child th': { border: 0 }, maxHeight: 60,
+                                                                minHeight: 5
+                                                            }}
+                                                        >
+                                                            <td> {index + 1}</td>
+                                                            <td> {val.procedureName}</td>
+                                                            <td> {val.procedureRate}</td>
+                                                            <td>
+                                                                <DeleteIcon size={6} onClick={() => rowSelect(val)} />
+                                                            </td>
+                                                        </tr>
+                                                    })}
+                                                </tbody>
+                                            </Table>
+                                        </CssVarsProvider>
+                                    </Box>
+                                    <Box>
+                                        <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
+                                            <Box sx={{ width: "70%", pt: 0.5, }}>
+                                            </Box>
+                                            <Box sx={{ width: "20%", pt: 0.5, }}>
+                                                <Typography sx={{ fontSize: 15, fontFamily: 'sans-serif', fontWeight: 550, pl: 8 }} >Total Amount</Typography>
+                                            </Box>
+                                            <Box sx={{ width: "10%", pt: 0.5, }}>
+                                                <Typography sx={{ fontSize: 15, fontFamily: 'sans-serif', fontWeight: 550, pl: 8 }} >{sumProcedureRate}</Typography>
+                                            </Box>
+
+                                        </Box>
+                                    </Box>
+                                </Box>
+                                : null
+                        }
+
+                    </Box>
 
 
+                    <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 2, pb: 2 }}>
+                        <Box sx={{ width: "50%", pt: 0.5, }}>
 
-
+                        </Box>
+                        <Box sx={{ width: "50%", pt: 0.5, display: 'flex', flexDirection: "row" }}>
+                            <Box sx={{ pl: 2 }}>
+                                <Button color="primary" variant="contained" onClick={submit} >Save</Button>
+                            </Box>
+                            {/* <Box sx={{ pl: 2 }}>
+                                    <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
+                                </Box>
+                                <Box sx={{ pl: 2 }}>
+                                    <Button color="primary" variant="contained" >close</Button>
+                                </Box> */}
+                        </Box>
 
                     </Box>
                 </Box>

@@ -3,13 +3,12 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-export const TokenBillPdfViewWithRegFee = (data) => {
-    const { patient_id, token_no, fee,
-        patient_name, patient_address, patient_pincode, patient_district,
-        patient_mobile, patient_age, doctor_name } = data[0]
+export const ProcedureBillPdfView = (pateintid, patient, lastVisitId, dataset, sumProcedureRate) => {
+
+    const { patient_name, patient_address, patient_district, patient_mobile, patient_age } = patient
+
     const xx = format(new Date(), "dd-MM-yyyy")
-    const regFee = 100
-    const total = regFee + fee
+
     var doc = {
         background: function (currentPage, pageSize) {
             return {
@@ -110,72 +109,118 @@ export const TokenBillPdfViewWithRegFee = (data) => {
                     widths: [100, 150, 100, 150],
                     body: [
                         [{ text: 'Patient Id', fontSize: 12, font: 'Roboto' },
-                        { text: patient_id, fontSize: 12, font: 'Roboto' },
-                        { text: 'Date', fontSize: 12, font: 'Roboto' },
-                        { text: xx, fontSize: 12, font: 'Roboto' }
+                        { text: pateintid, fontSize: 12, font: 'Roboto' },
+                        { text: 'Bill No', fontSize: 12, font: 'Roboto' },
+                        { text: lastVisitId, fontSize: 12, font: 'Roboto' },
                         ],
                         [{ text: 'Patient Name', fontSize: 12, font: 'Roboto' },
                         { text: patient_name, fontSize: 12, font: 'Roboto' },
-                        { text: 'Age', fontSize: 12, font: 'Roboto' },
-                        { text: patient_age, fontSize: 12, font: 'Roboto' },
+                        { text: 'Bill Date', fontSize: 12, font: 'Roboto' },
+                        { text: xx, fontSize: 12, font: 'Roboto' }
+
                         ],
                         [{ text: 'Address', fontSize: 12, font: 'Roboto' },
                         { text: patient_address, fontSize: 12, font: 'Roboto' },
-                        { text: 'Mobile', fontSize: 12, font: 'Roboto' },
-                        { text: patient_mobile, fontSize: 12, font: 'Roboto' }
-                        ],
-                        [{ text: 'Pin Code', fontSize: 12, font: 'Roboto' },
-                        { text: patient_pincode, fontSize: 12, font: 'Roboto' },
-                        { text: 'Doctor Name', fontSize: 12, font: 'Roboto' },
-                        { text: doctor_name, fontSize: 12, font: 'Roboto' },
+                        { text: 'Age', fontSize: 12, font: 'Roboto' },
+                        { text: patient_age, fontSize: 12, font: 'Roboto' },
+
                         ],
                         [{ text: 'District', fontSize: 12, font: 'Roboto' },
                         { text: patient_district, fontSize: 12, font: 'Roboto' },
-                        { text: 'Token No', fontSize: 12, font: 'Roboto' },
-                        { text: token_no, fontSize: 12, font: 'Roboto' }
+                        { text: 'Mobile', fontSize: 12, font: 'Roboto' },
+                        { text: patient_mobile, fontSize: 12, font: 'Roboto' }
                         ],
+
 
                     ]
                 },
                 layout: 'noBorders'
             },
 
+
+
             {
-                margin: [0, 10, 0, 0],
+                margin: [0, 3, 0, 0,],
                 style: 'tableExample',
                 table: {
                     widths: [60, 330, 70],
                     body: [
-                        [{ text: 'Sl No', fontSize: 12, font: 'Roboto' },
-                        { text: 'Description', fontSize: 12, font: 'Roboto' },
-                        { text: 'Amount', fontSize: 12, font: 'Roboto' }],
-                        [{ text: '1', fontSize: 12, font: 'Roboto' },
-                        { text: 'Registration Charge', fontSize: 12, font: 'Roboto' },
-                        { text: regFee, fontSize: 12, font: 'Roboto' }],
-                        [{ text: '2', fontSize: 12, font: 'Roboto' },
-                        { text: 'Consultation Charge', fontSize: 12, font: 'Roboto' },
-                        { text: fee, fontSize: 12, font: 'Roboto' }],
-
+                        [{ text: 'Sl no', fontSize: 12, bold: true, },
+                        { text: ' Description', fontSize: 12, bold: true },
+                        { text: 'Rate', fontSize: 12, bold: true },
+                        ]
                     ]
-                },
-
+                        .concat(dataset && dataset.map((val) => [
+                            { text: val.bill_proc_slno, fontSize: 12 },
+                            { text: val.procedure_name, fontSize: 12 },
+                            { text: val.procedure_rate, fontSize: 12 }
+                        ]))
+                }
             },
 
 
             {
-                margin: [210, 20, 0, 0],
+                margin: [325, 20, 0, 0],
                 style: 'tableExample',
                 table: {
-                    widths: [110, 60],
+                    widths: [80, 60],
                     body: [
 
-                        [{ text: 'Total Amount', fontSize: 12, font: 'Roboto' },
-                        { text: total, fontSize: 12, font: 'Roboto' }],
+                        [{ text: 'Total Amount', fontSize: 12, font: 'Roboto', bold: true },
+                        { text: sumProcedureRate, fontSize: 15, font: 'Roboto', bold: true }],
 
                     ]
                 },
                 layout: 'noBorders'
             },
+
+
+            {
+                margin: [0, 45, 0, 0],
+                style: 'tableExample',
+                table: {
+                    widths: [350, 130],
+                    body: [
+
+                        [{},
+                        { text: 'Seal & Signature', fontSize: 12, font: 'Roboto' }],
+                        [
+                            {
+                                table: {
+                                    widths: [350, 130],
+                                    body: [
+
+                                        [{}, {}],
+                                        [{}, {}],
+                                        [{}, {}],
+
+                                    ]
+                                }, layout: 'noBorders'
+                            },
+                            {
+                                table: {
+                                    widths: [350, 130],
+                                    body: [
+
+                                        [{}, {}],
+                                        [{}, {}],
+                                        [{}, {}],
+
+
+
+                                    ]
+                                },
+                                layout: 'noBorders'
+                            }
+                        ]
+
+                    ]
+                },
+                layout: 'noBorders'
+            },
+
+
+
         ]
 
 
@@ -183,4 +228,9 @@ export const TokenBillPdfViewWithRegFee = (data) => {
 
     }
     pdfMake.createPdf(doc).open();
+
+
+
+
+
 }

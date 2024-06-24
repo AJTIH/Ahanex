@@ -6,22 +6,17 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import { TokenBillPdfView } from './BillPdfView';
-import { TokenBillPdfViewWithRegFee } from './BillPdfWithRegFee';
+import { ProcedureBillPdfView } from './ProcedureBillPdf';
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="left" ref={ref} {...props} />;
 });
 
-
-const ShowPAge = ({ open, lastVisitId, reset, flag }) => {
+const ShowPrint = ({ open, lastVisitId, reset, patient, pateintid, sumProcedureRate }) => {
     const [dataset, setDataset] = useState([])
     useEffect(() => {
-
-
         const getDataForPrint = async (lastVisitId) => {
-            const result = await axioslogin.get(`/patientRegistration/lastInsertVistForPrint/${lastVisitId}`)
+            const result = await axioslogin.get(`/Billing/getBillDetailForPrint/${lastVisitId}`)
             const { success, data } = result.data
-            //   console.log(data);
             if (success === 1) {
                 setDataset(data)
             } else {
@@ -33,14 +28,9 @@ const ShowPAge = ({ open, lastVisitId, reset, flag }) => {
 
     const printtoken = useCallback(() => {
         if (dataset.length !== 0) {
-            if (flag === 0) {
-                TokenBillPdfView(dataset)
-            }
-            else {
-                TokenBillPdfViewWithRegFee(dataset)
-            }
+            ProcedureBillPdfView(pateintid, patient, lastVisitId, dataset, sumProcedureRate)
         }
-    }, [dataset, flag])
+    }, [dataset, patient, pateintid])
 
     const handleClose = useCallback(() => {
         reset()
@@ -76,4 +66,4 @@ const ShowPAge = ({ open, lastVisitId, reset, flag }) => {
     )
 }
 
-export default memo(ShowPAge)
+export default memo(ShowPrint)

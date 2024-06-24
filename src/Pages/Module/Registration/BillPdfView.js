@@ -79,21 +79,21 @@ export const TokenBillPdfView = (data) => {
                 fontSize: 15,
                 margin: [15, 0, 0, 0],
                 text: 'Address',
-                style: 'header', bold: true,
+                style: 'header',
                 alignment: 'center',
             },
             {
                 fontSize: 15,
                 margin: [15, 0, 0, 0],
                 text: 'Place',
-                style: 'header', bold: true,
+                style: 'header',
                 alignment: 'center',
             },
             {
                 fontSize: 15,
                 margin: [15, 0, 0, 0],
                 text: 'No',
-                style: 'header', bold: true,
+                style: 'header',
                 alignment: 'center',
             },
             {
@@ -111,72 +111,59 @@ export const TokenBillPdfView = (data) => {
                     body: [
                         [{ text: 'Patient Id', fontSize: 12, font: 'Roboto' },
                         { text: patient_id, fontSize: 12, font: 'Roboto' },
-                        { text: 'Patient Name', fontSize: 12, font: 'Roboto' },
-                        { text: patient_name, fontSize: 12, font: 'Roboto' }],
+                        { text: 'Date', fontSize: 12, font: 'Roboto' },
+                        { text: xx, fontSize: 12, font: 'Roboto' }
+                        ],
+                        [{ text: 'Patient Name', fontSize: 12, font: 'Roboto' },
+                        { text: patient_name, fontSize: 12, font: 'Roboto' },
+                        { text: 'Age', fontSize: 12, font: 'Roboto' },
+                        { text: patient_age, fontSize: 12, font: 'Roboto' },
+                        ],
                         [{ text: 'Address', fontSize: 12, font: 'Roboto' },
                         { text: patient_address, fontSize: 12, font: 'Roboto' },
-                        { text: 'District', fontSize: 12, font: 'Roboto' },
-                        { text: patient_district, fontSize: 12, font: 'Roboto' },],
-                        [{ text: 'Pin Code', fontSize: 12, font: 'Roboto' },
-                        { text: patient_pincode, fontSize: 12, font: 'Roboto' },
                         { text: 'Mobile', fontSize: 12, font: 'Roboto' },
                         { text: patient_mobile, fontSize: 12, font: 'Roboto' }
                         ],
-                        [{ text: 'DOB', fontSize: 12, font: 'Roboto' },
-                        { text: dob, fontSize: 12, font: 'Roboto' },
-                        { text: 'Age', fontSize: 12, font: 'Roboto' },
-                        { text: patient_age, fontSize: 12, font: 'Roboto' }
-                        ],
-                        [{ text: 'Doctor Name', fontSize: 12, font: 'Roboto' },
+                        [{ text: 'Pin Code', fontSize: 12, font: 'Roboto' },
+                        { text: patient_pincode, fontSize: 12, font: 'Roboto' },
+                        { text: 'Doctor Name', fontSize: 12, font: 'Roboto' },
                         { text: doctor_name, fontSize: 12, font: 'Roboto' },
+                        ],
+                        [{ text: 'District', fontSize: 12, font: 'Roboto' },
+                        { text: patient_district, fontSize: 12, font: 'Roboto' },
                         { text: 'Token No', fontSize: 12, font: 'Roboto' },
                         { text: token_no, fontSize: 12, font: 'Roboto' }
                         ],
-                        [{ text: 'Date', fontSize: 12, font: 'Roboto' },
-                        { text: xx, fontSize: 12, font: 'Roboto' },
-                        {},
-                        {}
-                        ],
+
                     ]
                 },
                 layout: 'noBorders'
             },
 
             {
-                margin: [15, 20, 0, 0],
+                margin: [0, 10, 0, 0],
                 style: 'tableExample',
                 table: {
-                    widths: [100, 270, 50],
+                    widths: [60, 330, 70],
                     body: [
                         [{ text: 'Sl No', fontSize: 12, font: 'Roboto' },
                         { text: 'Description', fontSize: 12, font: 'Roboto' },
                         { text: 'Amount', fontSize: 12, font: 'Roboto' }],
-
-
-                    ]
-                },
-                layout: 'noBorders'
-            },
-            {
-                margin: [15, 20, 0, 0],
-                style: 'tableExample',
-                table: {
-                    widths: [100, 270, 50],
-                    body: [
-
                         [{ text: '1', fontSize: 12, font: 'Roboto' },
                         { text: 'Consultation Charge', fontSize: 12, font: 'Roboto' },
                         { text: fee, fontSize: 12, font: 'Roboto' }],
 
                     ]
                 },
-                layout: 'noBorders'
+
             },
+
+
             {
-                margin: [280, 20, 0, 0],
+                margin: [210, 20, 0, 0],
                 style: 'tableExample',
                 table: {
-                    widths: [110, 100],
+                    widths: [110, 60],
                     body: [
 
                         [{ text: 'Total Amount', fontSize: 12, font: 'Roboto' },

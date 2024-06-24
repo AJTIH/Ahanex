@@ -54,19 +54,6 @@ const SalutationDropDown = ({ salutn, setSalutn, setSalutnname }) => {
                     )
                 })}
         </Select>
-        // <Select
-        //     color="primary"
-        //     placeholder="Salutation"
-        //     size="sm"
-        //     // defaultValue="Select "
-        //     value={salutn}
-        //     onChange={(e) => setSalutn(e.target.value)}
-        // >
-        //     <Option value={0}>Choose Salutation</Option>
-        //     {
-        //         salutation?.map((val) => <Option value={val.value}>{val.name}</Option>)
-        //     }
-        // </Select>
     )
 }
 
