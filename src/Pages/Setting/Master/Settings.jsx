@@ -3,8 +3,6 @@ import { Box } from '@mui/joy'
 import { Paper } from '@mui/material'
 import Typography from '@mui/joy/Typography'
 import CustomInput from '../../../Components/CustomInput'
-import SpecialityDropDown from '../../../Components/SpecialityDropDown'
-import CusCheckbox from '../../../Components/CusCheckbox'
 import Button from '@mui/material/Button';
 import { axioslogin } from '../../../AxiosConfig/Axios'
 import { ToastContainer } from 'react-toastify'
@@ -18,11 +16,12 @@ const Settings = () => {
         clinic_address: '',
         clinic_mobile: '',
         reg_renewal_fee: '',
-        seting_mast_slno: 0
+        seting_mast_slno: 0,
+        clinic_mail: '',
 
     })
     //Destructuring
-    const { clinic_name, clinic_address, clinic_mobile, reg_renewal_fee, seting_mast_slno } = settingmaster
+    const { clinic_name, clinic_address, clinic_mobile, reg_renewal_fee, seting_mast_slno, clinic_mail } = settingmaster
     const updatesettingMaster = useCallback((e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setSettingmaster({ ...settingmaster, [e.target.name]: value })
@@ -33,12 +32,13 @@ const Settings = () => {
             const result = await axioslogin.get(`/settingMaster`)
             const { success, data } = result.data
             if (success === 1) {
-                const { clinic_name, clinic_address, clinic_mobile, reg_renewaldays, master_slno } = data[0]
+                const { clinic_name, clinic_address, clinic_mobile, reg_renewaldays, master_slno, clinic_mail } = data[0]
                 const frmset = {
                     clinic_name: clinic_name,
                     clinic_address: clinic_address,
                     clinic_mobile: clinic_mobile,
                     reg_renewal_fee: reg_renewaldays,
+                    clinic_mail: clinic_mail,
                     seting_mast_slno: master_slno
 
                 }
@@ -49,7 +49,8 @@ const Settings = () => {
                     clinic_address: '',
                     clinic_mobile: '',
                     reg_renewal_fee: '',
-                    seting_mast_slno: 0
+                    seting_mast_slno: 0,
+                    clinic_mail: ''
                 }
                 setSettingmaster(reset)
             }
@@ -63,19 +64,21 @@ const Settings = () => {
             clinic_name: clinic_name,
             clinic_address: clinic_address,
             clinic_mobile: clinic_mobile,
+            clinic_mail: clinic_mail,
             reg_renewaldays: reg_renewal_fee
         }
-    }, [clinic_name, clinic_address, clinic_mobile, reg_renewal_fee])
+    }, [clinic_name, clinic_address, clinic_mobile, clinic_mail, reg_renewal_fee])
 
     const patchData = useMemo(() => {
         return {
             clinic_name: clinic_name,
             clinic_address: clinic_address,
             clinic_mobile: clinic_mobile,
+            clinic_mail: clinic_mail,
             reg_renewaldays: reg_renewal_fee,
             master_slno: seting_mast_slno
         }
-    }, [clinic_name, clinic_address, clinic_mobile, reg_renewal_fee, seting_mast_slno])
+    }, [clinic_name, clinic_address, clinic_mobile, clinic_mail, reg_renewal_fee, seting_mast_slno])
 
     const reset = useCallback(() => {
         const reset = {
@@ -83,7 +86,8 @@ const Settings = () => {
             clinic_address: '',
             clinic_mobile: '',
             reg_renewal_fee: '',
-            seting_mast_slno: 0
+            seting_mast_slno: 0,
+            clinic_mail: ''
         }
         setSettingmaster(reset)
 
@@ -170,6 +174,21 @@ const Settings = () => {
                             size="sm"
                             name="clinic_mobile"
                             value={clinic_mobile}
+                            handleChange={updatesettingMaster}
+
+                        />
+                    </Box>
+                </Box>
+                <Box className="flex justify-center items-center w-3/4">
+                    <Box className="flex-1 ml-2 " >
+                        <Typography level='body-md' fontWeight='lg' >Clinic Email.Address</Typography>
+                    </Box>
+                    <Box className="flex-1" >
+                        <CustomInput placeholder={'Enter Email Address'}
+                            type="text"
+                            size="sm"
+                            name="clinic_mail"
+                            value={clinic_mail}
                             handleChange={updatesettingMaster}
 
                         />
