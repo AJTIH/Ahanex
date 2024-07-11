@@ -3,10 +3,11 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-export const TokenBillPdfView = (data) => {
+export const TokenBillPdfView = (data, printingdata) => {
     const { patient_id, token_no, fee,
         patient_name, patient_address, patient_place, patient_pincode, patient_district,
         patient_mobile, patient_dob, patient_age, doctor_name } = data[0]
+    const { clinic_name, clinic_address, clinic_mobile, clinic_mail } = printingdata[0]
     const dob = format(new Date(patient_dob), "dd-MM-yyyy")
     const xx = format(new Date(), "dd-MM-yyyy")
     var doc = {
@@ -69,36 +70,30 @@ export const TokenBillPdfView = (data) => {
 
         content: [
             {
-                fontSize: 18,
-                margin: [15, 0, 0, 0],
-                text: 'Ahanex',
+                fontSize: 15,
+                margin: [90, 0, 0, 0],
+                text: clinic_name,
                 style: 'header', bold: true,
                 alignment: 'center',
             },
             {
-                fontSize: 15,
-                margin: [15, 0, 0, 0],
-                text: 'Address',
+                fontSize: 13,
+                margin: [50, 0, 0, 0],
+                text: clinic_address,
                 style: 'header',
                 alignment: 'center',
             },
+
             {
-                fontSize: 15,
-                margin: [15, 0, 0, 0],
-                text: 'Place',
-                style: 'header',
-                alignment: 'center',
-            },
-            {
-                fontSize: 15,
-                margin: [15, 0, 0, 0],
-                text: 'No',
+                fontSize: 13,
+                margin: [40, 0, 0, 0],
+                text: clinic_mobile,
                 style: 'header',
                 alignment: 'center',
             },
             {
                 fontSize: 17,
-                margin: [15, 0, 0, 0],
+                margin: [45, 0, 0, 0],
                 text: 'Visit Bill',
                 style: 'header', bold: true,
                 alignment: 'center',

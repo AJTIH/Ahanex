@@ -42,6 +42,7 @@ const ShowPrint = ({ open, lastVisitId, reset, patient, pateintid, sumProcedureR
 
     const printtoken = useCallback(() => {
         if (dataset.length !== 0) {
+            // BillPdfView(pateintid, patient, lastVisitId, dataset, sumProcedureRate, printingdata)
             ProcedureBillPdfView(pateintid, patient, lastVisitId, dataset, sumProcedureRate, printingdata)
         }
     }, [dataset, patient, pateintid])
