@@ -13,6 +13,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const ShowPrint = ({ open, lastVisitId, reset, patient, pateintid, sumProcedureRate }) => {
     const [dataset, setDataset] = useState([])
+    const [printingdata, setPrintingData] = useState([])
     useEffect(() => {
         const getDataForPrint = async (lastVisitId) => {
             const result = await axioslogin.get(`/Billing/getBillDetailForPrint/${lastVisitId}`)
@@ -23,12 +24,26 @@ const ShowPrint = ({ open, lastVisitId, reset, patient, pateintid, sumProcedureR
                 setDataset([])
             }
         }
+        const getSettingData = async () => {
+            const result = await axioslogin.get(`/settingMaster`)
+            const { success, data } = result.data
+            if (success === 1) {
+                setPrintingData(data)
+            } else {
+                setPrintingData([])
+            }
+        }
+        getSettingData()
+
+
+
         getDataForPrint(lastVisitId)
     }, [lastVisitId])
 
     const printtoken = useCallback(() => {
         if (dataset.length !== 0) {
-            ProcedureBillPdfView(pateintid, patient, lastVisitId, dataset, sumProcedureRate)
+            // BillPdfView(pateintid, patient, lastVisitId, dataset, sumProcedureRate, printingdata)
+            ProcedureBillPdfView(pateintid, patient, lastVisitId, dataset, sumProcedureRate, printingdata)
         }
     }, [dataset, patient, pateintid])
 

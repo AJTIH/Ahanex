@@ -15,6 +15,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const ShowPAge = ({ open, lastVisitId, reset, flag }) => {
     const [dataset, setDataset] = useState([])
+    const [printingdata, setPrintingData] = useState([])
     useEffect(() => {
 
 
@@ -28,16 +29,28 @@ const ShowPAge = ({ open, lastVisitId, reset, flag }) => {
                 setDataset([])
             }
         }
+
+        const getSettingData = async () => {
+            const result = await axioslogin.get(`/settingMaster`)
+            const { success, data } = result.data
+            if (success === 1) {
+                setPrintingData(data)
+            } else {
+                setPrintingData([])
+            }
+        }
+        getSettingData()
+
         getDataForPrint(lastVisitId)
     }, [lastVisitId])
 
     const printtoken = useCallback(() => {
         if (dataset.length !== 0) {
             if (flag === 0) {
-                TokenBillPdfView(dataset)
+                TokenBillPdfView(dataset, printingdata)
             }
             else {
-                TokenBillPdfViewWithRegFee(dataset)
+                TokenBillPdfViewWithRegFee(dataset, printingdata)
             }
         }
     }, [dataset, flag])
