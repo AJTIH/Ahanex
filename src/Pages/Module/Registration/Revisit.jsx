@@ -97,7 +97,7 @@ const Revisit = () => {
                 setDayDiff(xx);
             }
             else {
-                warningNotify("No Item Exist Given Asset Number")
+                warningNotify("No Last Visit")
             }
         }
 

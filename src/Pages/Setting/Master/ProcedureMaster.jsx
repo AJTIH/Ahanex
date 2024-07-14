@@ -1,9 +1,184 @@
-import React from 'react'
+import React, { useCallback, memo, useState, useMemo, Fragment } from 'react'
+import { Box } from '@mui/joy'
+import { Paper } from '@mui/material'
+import Typography from '@mui/joy/Typography'
+import CustomInput from '../../../Components/CustomInput'
+import SpecialityDropDown from '../../../Components/SpecialityDropDown'
+import CusCheckbox from '../../../Components/CusCheckbox'
+import Button from '@mui/material/Button';
+import { axioslogin } from '../../../AxiosConfig/Axios'
+import { ToastContainer } from 'react-toastify'
+import { succesNotify, warningNotify } from '../../../Components/CommonCode'
+import ProcedurMastTable from './ProcedurMastTable'
 
 const ProcedureMaster = () => {
+
+    const [procedureMast, setProcedureMast] = useState({
+        procedure_name: '',
+        procedure_rate: '',
+        procedure_status: '',
+        procedure_slno: ''
+    })
+    //Destructuring
+    const { procedure_name, procedure_rate, procedure_status, procedure_slno } = procedureMast
+    const updateProcedrMaster = useCallback((e) => {
+        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        setProcedureMast({ ...procedureMast, [e.target.name]: value })
+    }, [procedureMast])
+
+    const postData = useMemo(() => {
+        return {
+            procedure_name: procedure_name,
+            procedure_rate: procedure_rate,
+            procedure_status: procedure_status
+        }
+    }, [procedure_name, procedure_rate, procedure_status])
+
+
+    const patchdata = useMemo(() => {
+        return {
+            procedure_name: procedure_name,
+            procedure_rate: procedure_rate,
+            procedure_status: procedure_status,
+            procedure_slno: procedure_slno
+        }
+    }, [procedure_name, procedure_rate, procedure_status, procedure_slno])
+
+
+    const reset = useCallback(() => {
+        const resetfrm = {
+            procedure_name: '',
+            procedure_rate: '',
+            procedure_status: '',
+            procedure_slno: ''
+        }
+        setProcedureMast(resetfrm)
+    }, [])
+    const submit = useCallback(() => {
+
+        const InsertFun = async (postData) => {
+            const result = await axioslogin.post('/DoctorMaster', postData);
+            const { success, message } = result.data
+
+            if (success === 1) {
+                reset()
+                succesNotify(message)
+            } else {
+                warningNotify(message)
+            }
+        }
+
+        const updateDoctorMAst = async (patchdata) => {
+            const result = await axioslogin.patch('/DoctorMaster', patchdata);
+            const { success, message } = result.data
+            if (success === 1) {
+                reset()
+                succesNotify(message)
+            } else {
+                warningNotify(message)
+            }
+        }
+
+
+        if (procedure_name !== '') {
+            if (editFlag === 2) {
+                updateDoctorMAst(patchdata)
+            } else {
+                InsertFun(postData)
+            }
+
+        } else {
+            warningNotify("Please select doctor status")
+        }
+
+    }, [postData, procedure_name, patchdata])
+
+    const [editFlag, setEditFlag] = useState(0)
+    const viewdata = useCallback(() => {
+        setEditFlag(1)
+    }, [])
+
+    const rowSelect = useCallback((value) => {
+        setEditFlag(2)
+        const { procedure_name, procedure_rate, procedure_status, procedure_slno } = value
+        const resetfrm = {
+            procedure_name: procedure_name,
+            procedure_rate: procedure_rate,
+            procedure_status: procedure_status,
+            procedure_slno: procedure_slno
+        }
+        setProcedureMast(resetfrm)
+
+    }, [])
+    const CloseFnctn = useCallback(() => {
+        setEditFlag(0)
+    }, [])
+
     return (
-        <div>ProcedureMaster</div>
+        <Fragment>
+
+            <ToastContainer />
+            {editFlag === 1 ? <ProcedurMastTable rowSelect={rowSelect} CloseFnctn={CloseFnctn} /> :
+                <Paper className='w-full flex flex-1 flex-col m-5 p-2  items-center justify-center gap-1 ' >
+
+                    <Box className="flex justify-center items-center w-3/4">
+                        <Box className="flex-1 ml-2 " >
+                            <Typography level='body-md' fontWeight='lg' >Procedure Name</Typography>
+                        </Box>
+                        <Box className="flex-1" >
+                            <CustomInput placeholder={'Enter Doctor Name'}
+                                type="text"
+                                size="sm"
+                                name="procedure_name"
+                                value={procedure_name}
+                                handleChange={updateProcedrMaster}
+
+                            />
+                        </Box>
+                    </Box>
+
+
+
+
+                    <Box className="flex justify-center items-center w-3/4">
+                        <Box className="flex-1 ml-2 " >
+                            <Typography level='body-md' fontWeight='lg' >Doctor Status</Typography>
+                        </Box>
+                        <Box className="flex-1 ml-2 " >
+                            <CusCheckbox
+                                // label="Status"
+                                color="primary"
+                                size="md"
+                                fontWeight='lg'
+                                name="procedure_status"
+                                value={procedure_status}
+                                checked={procedure_status}
+                                onCheked={updateProcedrMaster}
+
+                            ></CusCheckbox>
+                        </Box>
+
+                    </Box>
+
+                    <Box className="flex justify-center items-center w-3/4">
+
+
+                        <Box sx={{ pl: 2 }}>
+                            <Button color="primary" variant="contained" onClick={submit} >Save</Button>
+                        </Box>
+                        <Box sx={{ pl: 2 }}>
+                            <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
+                        </Box>
+                    </Box>
+
+                </Paper>
+
+            }
+
+
+
+        </Fragment >
     )
 }
 
-export default ProcedureMaster
+export default memo(ProcedureMaster)
