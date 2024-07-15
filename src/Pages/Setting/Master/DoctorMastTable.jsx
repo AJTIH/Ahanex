@@ -10,6 +10,7 @@ import CustomInput from '../../../Components/CustomInput'
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import CusIconButton from '../../../Components/CusIconButton'
 import CloseIcon from '@mui/icons-material/Close';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
     const [tableData, setTabledata] = useState([])
@@ -31,7 +32,7 @@ const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
             if (success === 1) {
                 setTabledata(data)
             } else {
-                warningNotify("Error occured contact EDP")
+                warningNotify("No Doctors added")
             }
         }
         getDoctorList();
@@ -40,12 +41,10 @@ const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
     const postData = useMemo(() => {
         return {
             doctor_name: doctorname,
-            speciality: speciality
+            speciality_name: speciality
         }
     }, [doctorname])
     const searchbyCondtn = useCallback(() => {
-
-
         const getByDctrName = async (postdata) => {
             const result = await axioslogin.post('/DoctorMaster/searchDctrName', postdata)
             const { data, success } = result.data
@@ -53,23 +52,60 @@ const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
                 setTabledata(data)
             }
             else {
-                warningNotify("No Item Exist Given Asset Number")
+                warningNotify("No Doctor Found in given condition")
             }
         }
 
-
+        const getBySpecName = async (postdata) => {
+            const result = await axioslogin.post('/DoctorMaster/searchprocedureName', postdata)
+            const { data, success } = result.data
+            if (success === 1) {
+                setTabledata(data)
+            }
+            else {
+                warningNotify("No Doctor Found in given condition")
+            }
+        }
+        const getByDctrNSpecName = async (postdata) => {
+            const result = await axioslogin.post('/DoctorMaster/searchDctrNProcdrName', postdata)
+            const { data, success } = result.data
+            if (success === 1) {
+                setTabledata(data)
+            }
+            else {
+                warningNotify("No Doctor Found in given condition")
+            }
+        }
 
         if (doctorname === '' && speciality === '') {
             warningNotify("Please Select any condition before search")
-        }
-        else if (doctorname !== '' && speciality === '') {
-
+        } else if (doctorname !== '' && speciality === '') {
             getByDctrName(postData)
+        } else if (doctorname === '' && speciality !== '') {
+            getBySpecName(postData)
+        } else if (doctorname !== '' && speciality !== '') {
+            getByDctrNSpecName(postData)
         }
 
     }, [postData, doctorname, speciality])
 
-
+    const RefreshFunctn = useCallback(() => {
+        const resetfrm = {
+            doctorname: '',
+            speciality: ''
+        }
+        setDocmaster(resetfrm)
+        const getDoctorList = async () => {
+            const result = await axioslogin.get('/DoctorMaster')
+            const { success, data } = result.data
+            if (success === 1) {
+                setTabledata(data)
+            } else {
+                warningNotify("No Doctors added")
+            }
+        }
+        getDoctorList();
+    }, [])
 
     return (
         <Paper className='w-full flex flex-1 flex-col m-5 p-5  items-center justify-center gap-1 ' >
@@ -109,16 +145,19 @@ const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
                                 <SearchOutlinedIcon color='primary' fontSize='small' />
                             </CusIconButton>
                         </Box>
-                        <Box sx={{ width: '3%', pl: 1 }}>
+                        <Box sx={{ width: '2%' }}>
+                            <CusIconButton size="sm" variant="outlined" clickable="true" onClick={RefreshFunctn} >
+                                <RefreshIcon color='primary' fontSize='small' />
+                            </CusIconButton>
+                        </Box>
+                        <Box sx={{ width: '3%', pl: 0.5 }}>
                             <CusIconButton size="sm" variant="outlined" clickable="true" onClick={CloseFnctn} >
                                 <CloseIcon color='primary' fontSize='small' />
                             </CusIconButton>
                         </Box>
-
-
                     </Box>
                     <Box sx={{
-                        borderBottom: 1, borderWidth: 0.1, borderColor: 'black', minHeight: 450, maxHeight: 600,
+                        borderBottom: 1, borderWidth: 0.1, borderColor: 'black', minHeight: 300, maxHeight: 600,
                         overflow: 'auto'
                     }} >
                         <CssVarsProvider>
@@ -131,8 +170,9 @@ const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
                                         <th style={{ width: '10%', align: "center" }}>Fee</th>
                                         <th style={{ width: '15%', align: "center" }}>Token Start </th>
                                         <th style={{ width: '15%', align: "center" }}>Token End</th>
+                                        <th style={{ width: '15%', align: "center" }}>Renewal days</th>
                                         <th style={{ width: '10%', align: "center" }}>Status </th>
-                                        <th style={{ width: '10%', align: "center" }}>Add</th>
+                                        <th style={{ width: '10%', align: "center" }}>Edit</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -150,6 +190,7 @@ const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
                                             <td> {val.doctor_fee}</td>
                                             <td> {val.doctor_token_start}</td>
                                             <td> {val.doctor_token_end}</td>
+                                            <td> {val.doctor_renewal_day}</td>
                                             <td> {val.status1}</td>
                                             <td>
                                                 <EditIcon size={6} color='primary' onClick={() => rowSelect(val)} />
@@ -160,12 +201,7 @@ const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
                             </Table>
                         </CssVarsProvider>
                     </Box>
-
                 </Box>
-
-
-
-
             </Box>
         </Paper>
     )

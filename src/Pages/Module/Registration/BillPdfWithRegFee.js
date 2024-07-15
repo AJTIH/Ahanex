@@ -1,3 +1,4 @@
+import { WrapText } from "@mui/icons-material";
 import { format } from "date-fns";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -122,7 +123,7 @@ export const TokenBillPdfViewWithRegFee = (data, printingdata) => {
                         [{ text: 'Pin Code', fontSize: 12, font: 'Roboto' },
                         { text: patient_pincode, fontSize: 12, font: 'Roboto' },
                         { text: 'Doctor Name', fontSize: 12, font: 'Roboto' },
-                        { text: doctor_name, fontSize: 12, font: 'Roboto' },
+                        { text: doctor_name, fontSize: 12, font: 'Roboto', WrapText: "true" },
                         ],
                         [{ text: 'District', fontSize: 12, font: 'Roboto' },
                         { text: patient_district, fontSize: 12, font: 'Roboto' },

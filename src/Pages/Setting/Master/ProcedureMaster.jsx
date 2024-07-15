@@ -3,16 +3,16 @@ import { Box } from '@mui/joy'
 import { Paper } from '@mui/material'
 import Typography from '@mui/joy/Typography'
 import CustomInput from '../../../Components/CustomInput'
-import SpecialityDropDown from '../../../Components/SpecialityDropDown'
 import CusCheckbox from '../../../Components/CusCheckbox'
 import Button from '@mui/material/Button';
 import { axioslogin } from '../../../AxiosConfig/Axios'
 import { ToastContainer } from 'react-toastify'
 import { succesNotify, warningNotify } from '../../../Components/CommonCode'
 import ProcedurMastTable from './ProcedurMastTable'
+import { useNavigate } from 'react-router-dom'
 
 const ProcedureMaster = () => {
-
+    const navigate = useNavigate()
     const [procedureMast, setProcedureMast] = useState({
         procedure_name: '',
         procedure_rate: '',
@@ -30,7 +30,7 @@ const ProcedureMaster = () => {
         return {
             procedure_name: procedure_name,
             procedure_rate: procedure_rate,
-            procedure_status: procedure_status
+            procedure_status: procedure_status === '' ? 0 : 1
         }
     }, [procedure_name, procedure_rate, procedure_status])
 
@@ -39,7 +39,7 @@ const ProcedureMaster = () => {
         return {
             procedure_name: procedure_name,
             procedure_rate: procedure_rate,
-            procedure_status: procedure_status,
+            procedure_status: procedure_status === '' ? 0 : 1,
             procedure_slno: procedure_slno
         }
     }, [procedure_name, procedure_rate, procedure_status, procedure_slno])
@@ -57,7 +57,7 @@ const ProcedureMaster = () => {
     const submit = useCallback(() => {
 
         const InsertFun = async (postData) => {
-            const result = await axioslogin.post('/DoctorMaster', postData);
+            const result = await axioslogin.post('/ProcedurMaster', postData);
             const { success, message } = result.data
 
             if (success === 1) {
@@ -69,7 +69,7 @@ const ProcedureMaster = () => {
         }
 
         const updateDoctorMAst = async (patchdata) => {
-            const result = await axioslogin.patch('/DoctorMaster', patchdata);
+            const result = await axioslogin.patch('/ProcedurMaster', patchdata);
             const { success, message } = result.data
             if (success === 1) {
                 reset()
@@ -81,14 +81,18 @@ const ProcedureMaster = () => {
 
 
         if (procedure_name !== '') {
-            if (editFlag === 2) {
-                updateDoctorMAst(patchdata)
+            if (procedure_rate !== '') {
+                if (editFlag === 2) {
+                    updateDoctorMAst(patchdata)
+                } else {
+                    InsertFun(postData)
+                }
             } else {
-                InsertFun(postData)
+                warningNotify("Please Enter procedure Rate")
             }
 
         } else {
-            warningNotify("Please select doctor status")
+            warningNotify("Please Enter procedure Name")
         }
 
     }, [postData, procedure_name, patchdata])
@@ -114,6 +118,9 @@ const ProcedureMaster = () => {
         setEditFlag(0)
     }, [])
 
+    const CloseMAster = useCallback(() => {
+        navigate('/Home')
+    }, [])
     return (
         <Fragment>
 
@@ -126,7 +133,7 @@ const ProcedureMaster = () => {
                             <Typography level='body-md' fontWeight='lg' >Procedure Name</Typography>
                         </Box>
                         <Box className="flex-1" >
-                            <CustomInput placeholder={'Enter Doctor Name'}
+                            <CustomInput placeholder={'Enter Procedure Name'}
                                 type="text"
                                 size="sm"
                                 name="procedure_name"
@@ -136,17 +143,27 @@ const ProcedureMaster = () => {
                             />
                         </Box>
                     </Box>
-
-
-
+                    <Box className="flex justify-center items-center w-3/4">
+                        <Box className="flex-1 ml-2 " >
+                            <Typography level='body-md' fontWeight='lg' >Procedure Rate</Typography>
+                        </Box>
+                        <Box className="flex-1" >
+                            <CustomInput placeholder={'Enter Procedure Rate'}
+                                type="text"
+                                size="sm"
+                                name="procedure_rate"
+                                value={procedure_rate}
+                                handleChange={updateProcedrMaster}
+                            />
+                        </Box>
+                    </Box>
 
                     <Box className="flex justify-center items-center w-3/4">
                         <Box className="flex-1 ml-2 " >
-                            <Typography level='body-md' fontWeight='lg' >Doctor Status</Typography>
+                            <Typography level='body-md' fontWeight='lg' >Procedure Status</Typography>
                         </Box>
                         <Box className="flex-1 ml-2 " >
                             <CusCheckbox
-                                // label="Status"
                                 color="primary"
                                 size="md"
                                 fontWeight='lg'
@@ -154,29 +171,22 @@ const ProcedureMaster = () => {
                                 value={procedure_status}
                                 checked={procedure_status}
                                 onCheked={updateProcedrMaster}
-
                             ></CusCheckbox>
                         </Box>
-
                     </Box>
-
                     <Box className="flex justify-center items-center w-3/4">
-
-
                         <Box sx={{ pl: 2 }}>
                             <Button color="primary" variant="contained" onClick={submit} >Save</Button>
                         </Box>
                         <Box sx={{ pl: 2 }}>
-                            <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
+                            <Button color="primary" variant="contained" onClick={viewdata}>View</Button>
+                        </Box>
+                        <Box sx={{ pl: 2 }}>
+                            <Button color="primary" variant="contained" onClick={CloseMAster}>Close</Button>
                         </Box>
                     </Box>
-
                 </Paper>
-
             }
-
-
-
         </Fragment >
     )
 }

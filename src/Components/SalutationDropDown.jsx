@@ -21,7 +21,7 @@ const salutation = [
     { value: 16, name: 'Judge.' }
 ]
 
-const SalutationDropDown = ({ salutn, setSalutn, setSalutnname }) => {
+const SalutationDropDown = ({ salutn, setSalutn }) => {
 
 
     return (
@@ -33,7 +33,7 @@ const SalutationDropDown = ({ salutn, setSalutn, setSalutnname }) => {
             value={salutn}
             onChange={(e, { props }) => {
                 setSalutn(e.target.value);
-                setSalutnname(props.name)
+                // setSalutnname(props.name)
             }}
             // onChange={(e) => setSalutn(e.target.value)}
             size="small"

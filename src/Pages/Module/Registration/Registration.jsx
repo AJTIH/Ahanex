@@ -11,21 +11,25 @@ import { differenceInYears, format, getMonth } from 'date-fns'
 import SpecialityDropDown from '../../../Components/SpecialityDropDown'
 import DoctorDropDownBySepciality from '../../../Components/DoctorDropDownBySepciality'
 import ShowPAge from './ShowPAge'
+import { useNavigate } from 'react-router-dom'
+import RegistrationTable from './RegistrationTable'
 
 const Registration = () => {
+    const navigate = useNavigate()
     const [salutn, setSalutn] = useState(0)
-    const [salutnname, setSalutnname] = useState(0)
     const [registration, setRegistration] = useState({
         patient_name: '',
         patient_address: '',
         patient_place: '',
         patient_pincode: '',
         patient_district: '',
-        patient_mobile: ''
+        patient_mobile: '',
+        patient_slno: ''
 
     })
     //Destructuring
-    const { patient_name, patient_address, patient_place, patient_pincode, patient_district, patient_mobile } = registration
+    const { patient_name, patient_address, patient_place, patient_pincode, patient_district,
+        patient_mobile, patient_slno } = registration
     const updateregistrationState = useCallback((e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setRegistration({ ...registration, [e.target.name]: value })
@@ -119,7 +123,7 @@ const Registration = () => {
     const postData = useMemo(() => {
         return {
             patient_id: patientId,
-            salutation: salutnname,
+            salutation: salutn,
             patient_name: patient_name,
             patient_address: patient_address,
             patient_place: patient_place,
@@ -254,191 +258,238 @@ const Registration = () => {
 
     }, [postData, postVisitMast, patient_name, patient_address, patient_mobile, doctor, token_end, lastToken])
 
-    // const viewdata = useCallback(() => {
+    const [editFlag, setEditFlag] = useState(0)
+    const viewdata = useCallback(() => {
+        setEditFlag(1)
+    }, [])
 
-    // }, [])
+    const rowSelect = useCallback((value) => {
+        setEditFlag(2)
+
+        const { patient_slno, patient_id, salutation, patient_name,
+            patient_address, patient_place, patient_pincode, patient_district,
+            patient_mobile, patient_dob, patient_age, patient_month, patient_day } = value
+
+        const setFrmdata = {
+            patient_name: patient_name,
+            patient_address: patient_address,
+            patient_place: patient_place,
+            patient_pincode: patient_pincode,
+            patient_district: patient_district,
+            patient_mobile: patient_mobile,
+            patient_slno: patient_slno
+        }
+        setRegistration(setFrmdata)
+        setSalutn(salutation)
+        setpatient_dob(patient_dob)
+        const agereset = {
+            patient_age: patient_age,
+            patient_month: patient_month,
+            patient_day: patient_day,
+        }
+        setAgesplit(agereset)
+        setPatientId(patient_id)
+    }, [])
+
+    const CloseFnctn = useCallback(() => {
+        setEditFlag(0)
+    }, [])
+    const CloseMAster = useCallback(() => {
+        navigate('/Home')
+    }, [])
 
     return (
         <Fragment>
-            {modal === 1 ? <ShowPAge open={modalFlag} lastVisitId={lastVisitId} reset={reset} flag={1} /> : null}
-            <Paper className='w-full flex flex-1 flex-col m-5 p-2  items-center justify-center gap-1 ' >
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex-1 ml-2 " >
-                        <Typography level='body-md' fontWeight='lg' >Patient Id</Typography>
-                    </Box>
-                    <Box className="flex-1" >
-                        <CustomInput
-                            type="text"
-                            size="sm"
-                            name="patientId"
-                            value={patientId.toString().padStart(6, '0')}
-                            disable={true}
-                        />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex-1 ml-2 " >
-                        <Typography level='body-md' fontWeight='lg' >Salutation</Typography>
-                    </Box>
-                    <Box className="flex-1" >
-                        <SalutationDropDown salutn={salutn} setSalutn={setSalutn} setSalutnname={setSalutnname} />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex-1 ml-2 " >
-                        <Typography level='body-md' fontWeight='lg' >Patient Name</Typography>
-                    </Box>
-                    <Box className="flex-1" >
-                        <CustomInput placeholder={'Enter Patient Name'}
-                            type="text"
-                            size="sm"
-                            name="patient_name"
-                            value={patient_name}
-                            handleChange={updateregistrationState} />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex-1 ml-2 " >
-                        <Typography level='body-md' fontWeight='lg' >Address</Typography>
-                    </Box>
-                    <Box className="flex-1" >
-                        <CustomInput placeholder={"Enter Address"}
-                            type="text"
-                            size="sm"
-                            name="patient_address"
-                            value={patient_address}
-                            handleChange={updateregistrationState} />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex-1 ml-2 " >
-                        <Typography level='body-md' fontWeight='lg' >Place / Region</Typography>
-                    </Box>
-                    <Box className="flex-1" >
-                        <CustomInput placeholder={"Enter Region / Place"}
-                            type="text"
-                            size="sm"
-                            name="patient_place"
-                            value={patient_place}
-                            handleChange={updateregistrationState} />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex-1 ml-2" >
-                        <Typography level='body-md' fontWeight='lg'>Pincode</Typography>
-                    </Box>
-                    <Box className="flex-1" >
-                        <CustomInput placeholder={"Enter Pincode"}
-                            type="number"
-                            size="sm"
-                            name="patient_pincode"
-                            value={patient_pincode}
-                            handleChange={updateregistrationState} />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex-1 ml-2" >
-                        <Typography level='body-md' fontWeight='lg'>District</Typography>
-                    </Box>
-                    <Box className="flex-1" >
-                        <CustomInput placeholder={"Enter District"}
-                            type="text"
-                            size="sm"
-                            name="patient_district"
-                            value={patient_district}
-                            handleChange={updateregistrationState} />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex-1 ml-2" >
-                        <Typography level='body-md' fontWeight='lg'>Mobile</Typography>
-                    </Box>
-                    <Box className="flex-1" >
-                        <CustomInput placeholder={"Enter Mobile"}
-                            type="number"
-                            size="sm"
-                            name="patient_mobile"
-                            value={patient_mobile}
-                            handleChange={updateregistrationState} />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4">
-                    <Box className="flex flex-1 ml-2" >
-                        <Typography level='body-md' fontWeight='lg'>Date Of Birth</Typography>
-                    </Box>
-                    <Box className="flex flex-1 flex-row" >
-                        <CustomInput
-                            type="date"
-                            size="sm"
-                            name="patient_dob"
-                            value={patient_dob}
-                            handleChange={updatepatient_dob}
-                        />
-                        <Box className="flex flex-grow flex-row items-center" >
-                            <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center font-thin text-xs" >Age</Box>
-                            <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center border rounded-lg p-1" >{patient_age}</Box>
-                            <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center font-thin text-xs" >Months</Box>
-                            <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center border rounded-lg p-1" >{patient_month}</Box>
-                            <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center font-thin text-xs" >Days</Box>
-                            <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center border rounded-lg p-1" >{patient_day}</Box>
+            {
+                editFlag === 1 ?
+                    <RegistrationTable rowSelect={rowSelect} CloseFnctn={CloseFnctn} /> :
+                    <Paper className='w-full flex flex-1 flex-col m-5 p-2  items-center justify-center gap-1 ' >
+                        {modal === 1 ? <ShowPAge open={modalFlag} lastVisitId={lastVisitId} reset={reset} flag={1} /> : null}
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2 " >
+                                <Typography level='body-md' fontWeight='lg' >UH Id</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <CustomInput
+                                    type="text"
+                                    size="sm"
+                                    name="patientId"
+                                    value={patientId.toString().padStart(6, '0')}
+                                    disable={true}
+                                />
+                            </Box>
                         </Box>
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
-                    <Box sx={{ pl: 2, width: "30%" }}>
-                        <Typography level='body-md' fontWeight='lg' >Speciality</Typography>
-                    </Box>
-                    <Box sx={{ pl: 2, width: "30%" }}>
-                        <Typography level='body-md' fontWeight='lg' >Doctor Name</Typography>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2 " >
+                                <Typography level='body-md' fontWeight='lg' >Salutation</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <SalutationDropDown salutn={salutn} setSalutn={setSalutn} />
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2 " >
+                                <Typography level='body-md' fontWeight='lg' >Patient Name</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <CustomInput placeholder={'Enter Patient Name'}
+                                    type="text"
+                                    size="sm"
+                                    name="patient_name"
+                                    value={patient_name}
+                                    handleChange={updateregistrationState} />
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2 " >
+                                <Typography level='body-md' fontWeight='lg' >Address</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <CustomInput placeholder={"Enter Address"}
+                                    type="text"
+                                    size="sm"
+                                    name="patient_address"
+                                    value={patient_address}
+                                    handleChange={updateregistrationState} />
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2 " >
+                                <Typography level='body-md' fontWeight='lg' >Place / Region</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <CustomInput placeholder={"Enter Region / Place"}
+                                    type="text"
+                                    size="sm"
+                                    name="patient_place"
+                                    value={patient_place}
+                                    handleChange={updateregistrationState} />
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2" >
+                                <Typography level='body-md' fontWeight='lg'>Pincode</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <CustomInput placeholder={"Enter Pincode"}
+                                    type="number"
+                                    size="sm"
+                                    name="patient_pincode"
+                                    value={patient_pincode}
+                                    handleChange={updateregistrationState} />
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2" >
+                                <Typography level='body-md' fontWeight='lg'>District</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <CustomInput placeholder={"Enter District"}
+                                    type="text"
+                                    size="sm"
+                                    name="patient_district"
+                                    value={patient_district}
+                                    handleChange={updateregistrationState} />
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2" >
+                                <Typography level='body-md' fontWeight='lg'>Mobile</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <CustomInput placeholder={"Enter Mobile"}
+                                    type="number"
+                                    size="sm"
+                                    name="patient_mobile"
+                                    value={patient_mobile}
+                                    handleChange={updateregistrationState} />
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex flex-1 ml-2" >
+                                <Typography level='body-md' fontWeight='lg'>Date Of Birth</Typography>
+                            </Box>
+                            <Box className="flex flex-1 flex-row" >
+                                <CustomInput
+                                    type="date"
+                                    size="sm"
+                                    name="patient_dob"
+                                    value={patient_dob}
+                                    handleChange={updatepatient_dob}
+                                />
+                                <Box className="flex flex-grow flex-row items-center" >
+                                    <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center font-thin text-xs" >Age</Box>
+                                    <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center border rounded-lg p-1" >{patient_age}</Box>
+                                    <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center font-thin text-xs" >Months</Box>
+                                    <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center border rounded-lg p-1" >{patient_month}</Box>
+                                    <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center font-thin text-xs" >Days</Box>
+                                    <Box className="flex text-[#75abe2] border-[#75abe2] flex-grow justify-center border rounded-lg p-1" >{patient_day}</Box>
+                                </Box>
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
+                            <Box sx={{ pl: 2, width: "30%" }}>
+                                <Typography level='body-md' fontWeight='lg' >Speciality</Typography>
+                            </Box>
+                            <Box sx={{ pl: 2, width: "30%" }}>
+                                <Typography level='body-md' fontWeight='lg' >Doctor Name</Typography>
 
-                    </Box>
-                    <Box sx={{ pl: 2, width: "30%" }}>
-                        <Typography level='body-md' fontWeight='lg' >Fee</Typography>
-                    </Box>
-                    <Box sx={{ pl: 2, width: "30%" }}>
-                        <Typography level='body-md' fontWeight='lg' >Token No</Typography>
+                            </Box>
+                            <Box sx={{ pl: 2, width: "30%" }}>
+                                <Typography level='body-md' fontWeight='lg' >Fee</Typography>
+                            </Box>
+                            <Box sx={{ pl: 2, width: "30%" }}>
+                                <Typography level='body-md' fontWeight='lg' >Token No</Typography>
 
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4" sx={{}}>
-                    <Box sx={{ pl: 2, width: "30%" }}>
-                        <SpecialityDropDown speciality={speciality} setspeciality={setspeciality} />
-                    </Box>
-                    <Box sx={{ pl: 2, width: "30%" }}>
-                        <DoctorDropDownBySepciality doctor={doctor} setDoctor={setDoctor} speciality={speciality} />
-                    </Box>
-                    <Box sx={{ pl: 2, width: "30%" }}>
-                        <CustomInput
-                            type="text"
-                            size="sm"
-                            name="Fee"
-                            value={Fee}
-                            disable={true}
-                        />
-                    </Box>
-                    <Box sx={{ pl: 2, width: "30%" }}>
-                        <CustomInput
-                            type="text"
-                            size="sm"
-                            value={doctor === 0 ? 0 : lastToken === 0 ? token_start : lastToken + 1}
-                            disable={true}
-                        />
-                    </Box>
-                </Box>
-                <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4" sx={{}}>
+                            <Box sx={{ pl: 2, width: "30%" }}>
+                                <SpecialityDropDown speciality={speciality} setspeciality={setspeciality} />
+                            </Box>
+                            <Box sx={{ pl: 2, width: "30%" }}>
+                                <DoctorDropDownBySepciality doctor={doctor} setDoctor={setDoctor} speciality={speciality} />
+                            </Box>
+                            <Box sx={{ pl: 2, width: "30%" }}>
+                                <CustomInput
+                                    type="text"
+                                    size="sm"
+                                    name="Fee"
+                                    value={Fee}
+                                    disable={true}
+                                />
+                            </Box>
+                            <Box sx={{ pl: 2, width: "30%" }}>
+                                <CustomInput
+                                    type="text"
+                                    size="sm"
+                                    value={doctor === 0 ? 0 : lastToken === 0 ? token_start : lastToken + 1}
+                                    disable={true}
+                                />
+                            </Box>
+                        </Box>
+                        <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
 
 
-                    <Box sx={{ pl: 2 }}>
-                        <Button color="primary" variant="contained" onClick={submit} >Save</Button>
-                    </Box>
-                    {/* <Box sx={{ pl: 2 }}>
-                    <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
-                </Box>
-                <Box sx={{ pl: 2 }}>
-                    <Button color="primary" variant="contained" >close</Button>
-                </Box> */}
-                </Box>
-            </Paper>
+                            <Box sx={{ pl: 2 }}>
+                                <Button color="primary" variant="contained" onClick={submit} >Save</Button>
+                            </Box>
+                            <Box sx={{ pl: 2 }}>
+                                <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
+                            </Box>
+                            <Box sx={{ pl: 2 }}>
+                                <Button color="primary" variant="contained" onClick={CloseMAster}>Close</Button>
+                            </Box>
+                        </Box>
+                    </Paper>
+
+
+
+            }
+
+
+
+
         </Fragment>
     )
 }

@@ -10,9 +10,9 @@ import { axioslogin } from '../../../AxiosConfig/Axios'
 import { ToastContainer } from 'react-toastify'
 import { succesNotify, warningNotify } from '../../../Components/CommonCode'
 import DoctorMastTable from './DoctorMastTable'
-
+import { useNavigate } from 'react-router-dom'
 const Doctor = () => {
-
+    const navigate = useNavigate()
     const [speciality, setspeciality] = useState(0)
     const [docmaster, setDocmaster] = useState({
         doctor_name: '',
@@ -135,6 +135,9 @@ const Doctor = () => {
     const CloseFnctn = useCallback(() => {
         setEditFlag(0)
     }, [])
+    const CloseMAster = useCallback(() => {
+        navigate('/Home')
+    }, [])
     return (
         <Fragment>
 
@@ -243,26 +246,20 @@ const Doctor = () => {
 
                             ></CusCheckbox>
                         </Box>
-
                     </Box>
-
                     <Box className="flex justify-center items-center w-3/4">
-
-
                         <Box sx={{ pl: 2 }}>
                             <Button color="primary" variant="contained" onClick={submit} >Save</Button>
                         </Box>
                         <Box sx={{ pl: 2 }}>
                             <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
                         </Box>
+                        <Box sx={{ pl: 2 }}>
+                            <Button color="primary" variant="contained" onClick={CloseMAster}>Close</Button>
+                        </Box>
                     </Box>
-
                 </Paper>
-
             }
-
-
-
         </Fragment >
     )
 }

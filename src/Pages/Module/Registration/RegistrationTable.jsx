@@ -12,40 +12,34 @@ import CusIconButton from '../../../Components/CusIconButton'
 import CloseIcon from '@mui/icons-material/Close';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
 
+const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
     const [tableData, setTabledata] = useState([])
-    const [docmaster, setDocmaster] = useState({
-        procedure_name: ''
+    const [regmaster, setRegmaster] = useState({
+        patient_name: '',
+        patient_address: '',
+        patient_place: '',
+        patient_pincode: '',
+        patient_district: '',
+        patient_mobile: ''
     })
     //Destructuring
-    const { procedure_name } = docmaster
-    const updateDocMaster = useCallback((e) => {
+    const { patient_name, patient_address, patient_place, patient_pincode, patient_district, patient_mobile } = regmaster
+    const updateregistrationState = useCallback((e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-        setDocmaster({ ...docmaster, [e.target.name]: value })
-    }, [docmaster])
-
-    useEffect(() => {
-        const getDoctorList = async () => {
-            const result = await axioslogin.get('/ProcedurMaster')
-            const { success, data } = result.data
-            if (success === 1) {
-                setTabledata(data)
-            } else {
-                warningNotify("No procedure added yet!!!!!!")
-            }
-        }
-        getDoctorList();
-    }, [])
+        setRegmaster({ ...regmaster, [e.target.name]: value })
+    }, [regmaster])
 
     const postData = useMemo(() => {
         return {
-            procedure_name: procedure_name
+            patient_name: patient_name
         }
-    }, [procedure_name])
+    }, [patient_name])
     const searchbyCondtn = useCallback(() => {
-        const getBySpecName = async (postdata) => {
-            const result = await axioslogin.post('/ProcedurMaster/searchprocedureName', postdata)
+
+
+        const getBySpecName = async (postData) => {
+            const result = await axioslogin.post('/patientRegistration/searchprocedureName', postData)
             const { data, success } = result.data
             if (success === 1) {
                 setTabledata(data)
@@ -54,33 +48,23 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                 warningNotify("No Doctor Found in given condition")
             }
         }
-
-        if (procedure_name === '') {
-            warningNotify("Please Select any condition before search")
-        } else {
+        if (patient_name !== '') {
             getBySpecName(postData)
+
+
+        } else {
+            warningNotify("Please Select any condition before search")
         }
 
-    }, [postData, procedure_name])
+
+    }, [postData, patient_name])
 
     const RefreshFunctn = useCallback(() => {
-        const resetfrm = {
-            procedure_name: ''
-        }
-        setDocmaster(resetfrm)
-        const getDoctorList = async () => {
-            const result = await axioslogin.get('/ProcedurMaster')
-            const { success, data } = result.data
-            if (success === 1) {
-                setTabledata(data)
-            } else {
-                warningNotify("No procedure added yet!!!!!!")
-            }
-        }
-        getDoctorList();
+
     }, [])
 
     return (
+
         <Paper className='w-full flex flex-1 flex-col m-5 p-5  items-center justify-center gap-1 ' >
             <Box className="flex justify-center items-center p-3 ">
                 <Box sx={{
@@ -96,12 +80,12 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                     }}>
                         <Box sx={{ pl: 0.8, width: "30%", cursor: "pointer" }}></Box>
                         <Box sx={{ pl: 0.8, width: "30%", cursor: "pointer" }}>
-                            <CustomInput placeholder={"Procedure Name"}
+                            <CustomInput placeholder={"Patient Name"}
                                 type="text"
                                 size="sm"
-                                name="procedure_name"
-                                value={procedure_name}
-                                handleChange={updateDocMaster}
+                                name="patient_name"
+                                value={patient_name}
+                                handleChange={updateregistrationState}
                             />
                         </Box>
 
@@ -131,9 +115,12 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                                 <thead>
                                     <tr>
                                         <th style={{ width: '15%', align: "center" }}>Sl No</th>
-                                        <th style={{ width: '30%', align: "center" }}>Procedure Name</th>
-                                        <th style={{ width: '30%', align: "center" }}>Procedure rate </th>
-                                        <th style={{ width: '10%', align: "center" }}>Status </th>
+                                        <th style={{ width: '30%', align: "center" }}>Patient ID</th>
+                                        <th style={{ width: '30%', align: "center" }}>Patient Name</th>
+                                        <th style={{ width: '30%', align: "center" }}>Patient Address </th>
+                                        <th style={{ width: '30%', align: "center" }}>Patient Place </th>
+                                        <th style={{ width: '30%', align: "center" }}>Patient Mobile</th>
+                                        <th style={{ width: '30%', align: "center" }}>Patient Dob</th>
                                         <th style={{ width: '10%', align: "center" }}>Edit</th>
                                     </tr>
                                 </thead>
@@ -147,9 +134,12 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                                             }}
                                         >
                                             <td> {index + 1}</td>
-                                            <td> {val.procedure_name}</td>
-                                            <td> {val.procedure_rate}</td>
-                                            <td> {val.status1}</td>
+                                            <td> {val.patient_id}</td>
+                                            <td> {val.patient_name}</td>
+                                            <td> {val.patient_address}</td>
+                                            <td> {val.patient_place}</td>
+                                            <td> {val.patient_mobile}</td>
+                                            <td> {val.patient_dob}</td>
                                             <td>
                                                 <EditIcon size={6} color='primary' onClick={() => rowSelect(val)} />
                                             </td>
@@ -159,10 +149,11 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                             </Table>
                         </CssVarsProvider>
                     </Box>
+
                 </Box>
             </Box>
         </Paper>
     )
 }
 
-export default memo(ProcedurMastTable)
+export default RegistrationTable
