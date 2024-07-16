@@ -7,10 +7,11 @@ import Button from '@mui/material/Button';
 import { axioslogin } from '../../../AxiosConfig/Axios'
 import { ToastContainer } from 'react-toastify'
 import { succesNotify, warningNotify } from '../../../Components/CommonCode'
+import { useNavigate } from 'react-router-dom'
 
 const Settings = () => {
 
-
+    const navigate = useNavigate()
     const [settingmaster, setSettingmaster] = useState({
         clinic_name: '',
         clinic_address: '',
@@ -121,15 +122,17 @@ const Settings = () => {
         }
     }, [seting_mast_slno, postData, patchData])
 
-    const Close = useCallback(() => {
+    const clearfunctn = useCallback(() => {
         reset()
+    }, [])
+
+    const closefunctn = useCallback(() => {
+        navigate('/Home')
     }, [])
 
     return (
         <Fragment>
-
             <ToastContainer />
-
             <Paper className='w-full flex flex-1 flex-col m-5 p-2  items-center justify-center gap-1 ' >
 
                 <Box className="flex justify-center items-center w-3/4">
@@ -163,7 +166,6 @@ const Settings = () => {
                         />
                     </Box>
                 </Box>
-
                 <Box className="flex justify-center items-center w-3/4">
                     <Box className="flex-1 ml-2 " >
                         <Typography level='body-md' fontWeight='lg' >Clinic Mobile No</Typography>
@@ -212,17 +214,14 @@ const Settings = () => {
                 </Box>
 
                 <Box className="flex justify-center items-center w-3/4">
-
-
                     <Box sx={{ pl: 2 }}>
                         <Button color="primary" variant="contained" onClick={submit} >Save</Button>
                     </Box>
-                    {/* <Box sx={{ pl: 2 }}>
-                        <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
-                    </Box> */}
-
                     <Box sx={{ pl: 2 }}>
-                        <Button color="primary" variant="contained" onClick={Close} >close</Button>
+                        <Button color="primary" variant="contained" onClick={clearfunctn} >Clear</Button>
+                    </Box>
+                    <Box sx={{ pl: 2 }}>
+                        <Button color="primary" variant="contained" onClick={closefunctn} >Close</Button>
                     </Box>
                 </Box>
 
