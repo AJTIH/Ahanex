@@ -160,10 +160,12 @@ const Registration = () => {
             patient_dob: patient_dob,
             patient_age: patient_age,
             patient_month: patient_month,
-            patient_day: patient_day
+            patient_day: patient_day,
+            patient_slno: patient_slno
         }
     }, [salutn, patient_name, patient_address, patient_place, patient_pincode, patient_district, patient_mobile, patient_dob, patient_age,
-        patient_month, patient_day])
+        patient_month, patient_day, patient_slno])
+    console.log(patchdata);
     const reset = useCallback(() => {
         setSalutn(0)
         const resetdetail = {
@@ -211,14 +213,12 @@ const Registration = () => {
         getPatientId()
     }, [])
 
-
+    const [editFlag, setEditFlag] = useState(0)
     const submit = useCallback(() => {
 
         const InsertPatientReg = async (postData) => {
-
             const result = await axioslogin.post('/patientRegistration', postData);
             return result.data
-
         }
 
         const insertVistMaster = async (postVisitMast) => {
@@ -230,35 +230,53 @@ const Registration = () => {
                 succesNotify(message)
                 setModal(1)
                 setModalFlag(true)
-                // reset()
             } else {
                 warningNotify(message)
             }
         }
 
-        if (patient_name !== '' && patient_address !== '' && patient_mobile !== '' && doctor != 0) {
-            if (token_end >= lastToken + 1) {
-                InsertPatientReg(postData).then((val) => {
-                    const { success, message } = val
-                    if (success === 1) {
-                        insertVistMaster(postVisitMast)
-                    } else {
-                        warningNotify(message)
-                    }
-                })
+        const updatePatientMast = async (patchdata) => {
+            const result = await axioslogin.patch('/patientRegistration', patchdata);
+            const { success, message } = result.data
+            if (success === 1) {
+                reset()
+                succesNotify(message)
+            } else {
+                warningNotify(message)
             }
-            else {
-                warningNotify("Token Finished")
-            }
-
-        } else {
-            warningNotify("Please Fill Mandatory Fields")
         }
 
 
-    }, [postData, postVisitMast, patient_name, patient_address, patient_mobile, doctor, token_end, lastToken])
+        if (editFlag === 0) {
+            if (patient_name !== '' && patient_address !== '' && patient_mobile !== '' && doctor != 0) {
+                if (token_end >= lastToken + 1) {
+                    InsertPatientReg(postData).then((val) => {
+                        const { success, message } = val
+                        if (success === 1) {
+                            insertVistMaster(postVisitMast)
+                        } else {
+                            warningNotify(message)
+                        }
+                    })
+                }
+                else {
+                    warningNotify("Token Finished")
+                }
 
-    const [editFlag, setEditFlag] = useState(0)
+            } else {
+                warningNotify("Please Fill Mandatory Fields")
+            }
+        } else {
+
+            updatePatientMast(patchdata)
+        }
+
+
+
+    }, [postData, postVisitMast, patient_name, patient_address, patient_mobile, doctor, token_end,
+        editFlag, lastToken, patchdata])
+
+
     const viewdata = useCallback(() => {
         setEditFlag(1)
     }, [])
@@ -427,47 +445,56 @@ const Registration = () => {
                                 </Box>
                             </Box>
                         </Box>
-                        <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
-                            <Box sx={{ pl: 2, width: "30%" }}>
-                                <Typography level='body-md' fontWeight='lg' >Speciality</Typography>
-                            </Box>
-                            <Box sx={{ pl: 2, width: "30%" }}>
-                                <Typography level='body-md' fontWeight='lg' >Doctor Name</Typography>
+                        {editFlag === 0 ?
+                            <Box sx={{ width: "100%", pl: 35 }}>
+                                <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
+                                    <Box sx={{ pl: 2, width: "30%" }}>
+                                        <Typography level='body-md' fontWeight='lg' >Speciality</Typography>
+                                    </Box>
+                                    <Box sx={{ pl: 2, width: "30%" }}>
+                                        <Typography level='body-md' fontWeight='lg' >Doctor Name</Typography>
 
-                            </Box>
-                            <Box sx={{ pl: 2, width: "30%" }}>
-                                <Typography level='body-md' fontWeight='lg' >Fee</Typography>
-                            </Box>
-                            <Box sx={{ pl: 2, width: "30%" }}>
-                                <Typography level='body-md' fontWeight='lg' >Token No</Typography>
+                                    </Box>
+                                    <Box sx={{ pl: 2, width: "30%" }}>
+                                        <Typography level='body-md' fontWeight='lg' >Fee</Typography>
+                                    </Box>
+                                    <Box sx={{ pl: 2, width: "30%" }}>
+                                        <Typography level='body-md' fontWeight='lg' >Token No</Typography>
 
-                            </Box>
-                        </Box>
-                        <Box className="flex justify-center items-center w-3/4" sx={{}}>
-                            <Box sx={{ pl: 2, width: "30%" }}>
-                                <SpecialityDropDown speciality={speciality} setspeciality={setspeciality} />
-                            </Box>
-                            <Box sx={{ pl: 2, width: "30%" }}>
-                                <DoctorDropDownBySepciality doctor={doctor} setDoctor={setDoctor} speciality={speciality} />
-                            </Box>
-                            <Box sx={{ pl: 2, width: "30%" }}>
-                                <CustomInput
-                                    type="text"
-                                    size="sm"
-                                    name="Fee"
-                                    value={Fee}
-                                    disable={true}
-                                />
-                            </Box>
-                            <Box sx={{ pl: 2, width: "30%" }}>
-                                <CustomInput
-                                    type="text"
-                                    size="sm"
-                                    value={doctor === 0 ? 0 : lastToken === 0 ? token_start : lastToken + 1}
-                                    disable={true}
-                                />
-                            </Box>
-                        </Box>
+                                    </Box>
+                                </Box>
+                                <Box className="flex justify-center items-center w-3/4" sx={{}}>
+                                    <Box sx={{ pl: 2, width: "30%" }}>
+                                        <SpecialityDropDown speciality={speciality} setspeciality={setspeciality} />
+                                    </Box>
+                                    <Box sx={{ pl: 2, width: "30%" }}>
+                                        <DoctorDropDownBySepciality doctor={doctor} setDoctor={setDoctor} speciality={speciality} />
+                                    </Box>
+                                    <Box sx={{ pl: 2, width: "30%" }}>
+                                        <CustomInput
+                                            type="text"
+                                            size="sm"
+                                            name="Fee"
+                                            value={Fee}
+                                            disable={true}
+                                        />
+                                    </Box>
+                                    <Box sx={{ pl: 2, width: "30%" }}>
+                                        <CustomInput
+                                            type="text"
+                                            size="sm"
+                                            value={doctor === 0 ? 0 : lastToken === 0 ? token_start : lastToken + 1}
+                                            disable={true}
+                                        />
+                                    </Box>
+                                </Box>
+
+                            </Box> : null}
+
+
+
+
+
                         <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
 
 

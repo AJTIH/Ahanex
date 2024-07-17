@@ -18,13 +18,10 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
     const [regmaster, setRegmaster] = useState({
         patient_name: '',
         patient_address: '',
-        patient_place: '',
-        patient_pincode: '',
-        patient_district: '',
         patient_mobile: ''
     })
     //Destructuring
-    const { patient_name, patient_address, patient_place, patient_pincode, patient_district, patient_mobile } = regmaster
+    const { patient_name, patient_address, patient_mobile } = regmaster
     const updateregistrationState = useCallback((e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setRegmaster({ ...regmaster, [e.target.name]: value })
@@ -32,35 +29,73 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
 
     const postData = useMemo(() => {
         return {
-            patient_name: patient_name
+            patient_name: patient_name,
+            patient_address: patient_address,
+            patient_mobile: patient_mobile
         }
-    }, [patient_name])
+    }, [patient_name, patient_address, patient_mobile])
     const searchbyCondtn = useCallback(() => {
 
 
-        const getBySpecName = async (postData) => {
-            const result = await axioslogin.post('/patientRegistration/searchprocedureName', postData)
+        const getBypatientName = async (postData) => {
+            const result = await axioslogin.post('/patientRegistration/searchpatientName', postData)
             const { data, success } = result.data
             if (success === 1) {
                 setTabledata(data)
             }
             else {
-                warningNotify("No Doctor Found in given condition")
+                warningNotify("No Patient Found in given condition")
             }
         }
-        if (patient_name !== '') {
-            getBySpecName(postData)
+        const getByPatientAddress = async (postData) => {
+            const result = await axioslogin.post('/patientRegistration/searchAddress', postData)
+            const { data, success } = result.data
+            if (success === 1) {
+                setTabledata(data)
+            }
+            else {
+                warningNotify("No Patient Found in given condition")
+            }
+        }
+        const getByPatientMobileno = async (postData) => {
+            const result = await axioslogin.post('/patientRegistration/searchmobileNo', postData)
+            const { data, success } = result.data
+            if (success === 1) {
+                setTabledata(data)
+            }
+            else {
+                warningNotify("No Patient Found in given condition")
+            }
+        }
+
+        if (patient_name !== '' && patient_address === '' && patient_mobile === '') {
+            getBypatientName(postData)
+        } else if (patient_name === '' && patient_address !== '' && patient_mobile === '') {
+            getByPatientAddress(postData)
+        } else if (patient_name === '' && patient_address === '' && patient_mobile !== '') {
+            getByPatientMobileno(postData)
+        }
 
 
-        } else {
+
+
+
+        else {
             warningNotify("Please Select any condition before search")
         }
 
 
-    }, [postData, patient_name])
+    }, [postData, patient_name, patient_address, patient_mobile])
 
     const RefreshFunctn = useCallback(() => {
 
+        const refreshdata = {
+            patient_name: '',
+            patient_address: '',
+            patient_mobile: ''
+        }
+        setRegmaster(refreshdata)
+        setTabledata([])
     }, [])
 
     return (
@@ -78,13 +113,31 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
                         display: "flex",
                         flexDirection: "row", pb: 2
                     }}>
-                        <Box sx={{ pl: 0.8, width: "30%", cursor: "pointer" }}></Box>
+                        <Box sx={{ pl: 0.8, width: "20%", cursor: "pointer" }}></Box>
                         <Box sx={{ pl: 0.8, width: "30%", cursor: "pointer" }}>
                             <CustomInput placeholder={"Patient Name"}
                                 type="text"
                                 size="sm"
                                 name="patient_name"
                                 value={patient_name}
+                                handleChange={updateregistrationState}
+                            />
+                        </Box>
+                        <Box sx={{ pl: 0.8, width: "30%", cursor: "pointer" }}>
+                            <CustomInput placeholder={"Patient Address"}
+                                type="text"
+                                size="sm"
+                                name="patient_address"
+                                value={patient_address}
+                                handleChange={updateregistrationState}
+                            />
+                        </Box>
+                        <Box sx={{ pl: 0.8, width: "20%", cursor: "pointer" }}>
+                            <CustomInput placeholder={"Patient Mobile No"}
+                                type="text"
+                                size="sm"
+                                name="patient_mobile"
+                                value={patient_mobile}
                                 handleChange={updateregistrationState}
                             />
                         </Box>
