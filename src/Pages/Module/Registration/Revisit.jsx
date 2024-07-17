@@ -15,10 +15,10 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import CusIconButton from '../../../Components/CusIconButton';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ShowPAge from './ShowPAge'
-
+import { useNavigate } from 'react-router-dom'
 
 const Revisit = () => {
-
+    const navigate = useNavigate()
     const [pateintid, setPatientId] = useState('')
 
     const [patient, setPatient] = useState({
@@ -255,6 +255,9 @@ const Revisit = () => {
     }, [])
 
 
+    const CloseMAster = useCallback(() => {
+        navigate('/Home')
+    }, [])
 
 
 
@@ -508,12 +511,9 @@ const Revisit = () => {
                                 <Box sx={{ pl: 2 }}>
                                     <Button color="primary" variant="contained" onClick={submit} >Save</Button>
                                 </Box>
-                                {/* <Box sx={{ pl: 2 }}>
-                                    <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
-                                </Box>
                                 <Box sx={{ pl: 2 }}>
-                                    <Button color="primary" variant="contained" >close</Button>
-                                </Box> */}
+                                    <Button color="primary" variant="contained" onClick={CloseMAster}>Close</Button>
+                                </Box>
                             </Box>
 
                         </Box>

@@ -17,8 +17,9 @@ import { CssVarsProvider } from '@mui/joy/'
 import Table from '@mui/joy/Table';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShowPrint from './ShowPrint'
-
+import { useNavigate } from 'react-router-dom'
 const Billing = () => {
+    const navigate = useNavigate()
     const [pateintid, setPatientId] = useState('')
 
     const [patient, setPatient] = useState({
@@ -232,6 +233,11 @@ const Billing = () => {
 
 
     }, [postData, dataPost, pateintid])
+
+
+    const CloseMAster = useCallback(() => {
+        navigate('/Home')
+    }, [])
 
     return (
         <Box sx={{ width: "100%", p: 5 }}>
@@ -506,12 +512,9 @@ const Billing = () => {
                             <Box sx={{ pl: 2 }}>
                                 <Button color="primary" variant="contained" onClick={submit} >Save</Button>
                             </Box>
-                            {/* <Box sx={{ pl: 2 }}>
-                                    <Button color="primary" variant="contained" onClick={viewdata}>view</Button>
-                                </Box>
-                                <Box sx={{ pl: 2 }}>
-                                    <Button color="primary" variant="contained" >close</Button>
-                                </Box> */}
+                            <Box sx={{ pl: 2 }}>
+                                <Button color="primary" variant="contained" onClick={CloseMAster}>Close</Button>
+                            </Box>
                         </Box>
 
                     </Box>
