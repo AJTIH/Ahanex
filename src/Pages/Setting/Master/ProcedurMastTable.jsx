@@ -132,6 +132,7 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                                     <tr>
                                         <th style={{ width: '15%', align: "center" }}>Sl No</th>
                                         <th style={{ width: '30%', align: "center" }}>Procedure Name</th>
+                                        <th style={{ width: '30%', align: "center" }}>Procedure Code</th>
                                         <th style={{ width: '30%', align: "center" }}>Procedure rate </th>
                                         <th style={{ width: '10%', align: "center" }}>Status </th>
                                         <th style={{ width: '10%', align: "center" }}>Edit</th>
@@ -148,6 +149,7 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                                         >
                                             <td> {index + 1}</td>
                                             <td> {val.procedure_name}</td>
+                                            <td> {val.procedure_code}</td>
                                             <td> {val.procedure_rate}</td>
                                             <td> {val.status1}</td>
                                             <td>

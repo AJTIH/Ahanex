@@ -15,12 +15,13 @@ const ProcedureMaster = () => {
     const navigate = useNavigate()
     const [procedureMast, setProcedureMast] = useState({
         procedure_name: '',
+        procedure_code: '',
         procedure_rate: '',
         procedure_status: '',
         procedure_slno: ''
     })
     //Destructuring
-    const { procedure_name, procedure_rate, procedure_status, procedure_slno } = procedureMast
+    const { procedure_name, procedure_code, procedure_rate, procedure_status, procedure_slno } = procedureMast
     const updateProcedrMaster = useCallback((e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setProcedureMast({ ...procedureMast, [e.target.name]: value })
@@ -29,25 +30,28 @@ const ProcedureMaster = () => {
     const postData = useMemo(() => {
         return {
             procedure_name: procedure_name,
+            procedure_code: procedure_code,
             procedure_rate: procedure_rate,
             procedure_status: procedure_status === '' ? 0 : 1
         }
-    }, [procedure_name, procedure_rate, procedure_status])
+    }, [procedure_name, procedure_code, procedure_rate, procedure_status])
 
 
     const patchdata = useMemo(() => {
         return {
             procedure_name: procedure_name,
+            procedure_code: procedure_code,
             procedure_rate: procedure_rate,
             procedure_status: procedure_status === '' ? 0 : 1,
             procedure_slno: procedure_slno
         }
-    }, [procedure_name, procedure_rate, procedure_status, procedure_slno])
+    }, [procedure_name, procedure_code, procedure_rate, procedure_status, procedure_slno])
 
 
     const reset = useCallback(() => {
         const resetfrm = {
             procedure_name: '',
+            procedure_code: '',
             procedure_rate: '',
             procedure_status: '',
             procedure_slno: ''
@@ -104,10 +108,11 @@ const ProcedureMaster = () => {
 
     const rowSelect = useCallback((value) => {
         setEditFlag(2)
-        const { procedure_name, procedure_rate, procedure_status, procedure_slno } = value
+        const { procedure_name, procedure_rate, procedure_status, procedure_code, procedure_slno } = value
         const resetfrm = {
             procedure_name: procedure_name,
             procedure_rate: procedure_rate,
+            procedure_code: procedure_code,
             procedure_status: procedure_status,
             procedure_slno: procedure_slno
         }
@@ -138,6 +143,21 @@ const ProcedureMaster = () => {
                                 size="sm"
                                 name="procedure_name"
                                 value={procedure_name}
+                                handleChange={updateProcedrMaster}
+
+                            />
+                        </Box>
+                    </Box>
+                    <Box className="flex justify-center items-center w-3/4">
+                        <Box className="flex-1 ml-2 " >
+                            <Typography level='body-md' fontWeight='lg' >Procedure Code</Typography>
+                        </Box>
+                        <Box className="flex-1" >
+                            <CustomInput placeholder={'Enter Procedure Code'}
+                                type="text"
+                                size="sm"
+                                name="procedure_code"
+                                value={procedure_code}
                                 handleChange={updateProcedrMaster}
 
                             />
