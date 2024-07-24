@@ -6,55 +6,22 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import { TokenBillPdfView } from './BillPdfView';
-import { TokenBillPdfViewWithRegFee } from './BillPdfWithRegFee';
+import { ProcedureBillPdfView } from './ProcedureBillPdf';
+import { ProcedureBillPdfViewNew } from './BillingPdfNew';
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="left" ref={ref} {...props} />;
 });
 
 
-const ShowPAge = ({ open, lastVisitId, reset, flag }) => {
-    const [dataset, setDataset] = useState([])
-    const [printingdata, setPrintingData] = useState([])
-    useEffect(() => {
-        const getDataForPrint = async (lastVisitId) => {
-            const result = await axioslogin.get(`/patientRegistration/lastInsertVistForPrint/${lastVisitId}`)
-            const { success, data } = result.data
-            if (success === 1) {
-                setDataset(data)
-            } else {
-                setDataset([])
-            }
-        }
-
-        const getSettingData = async () => {
-            const result = await axioslogin.get(`/settingMaster`)
-            const { success, data } = result.data
-            if (success === 1) {
-                setPrintingData(data)
-            } else {
-                setPrintingData([])
-            }
-        }
-        getSettingData()
-
-        getDataForPrint(lastVisitId)
-    }, [lastVisitId])
+const ShowPrintNew = ({ open, reset, setPrintFlag }) => {
 
     const printtoken = useCallback(() => {
-        if (dataset.length !== 0) {
-            if (flag === 0) {
-                TokenBillPdfView(dataset, printingdata)
-            }
-            else {
-                TokenBillPdfViewWithRegFee(dataset, printingdata)
-            }
-        }
-    }, [dataset, flag])
+        ProcedureBillPdfViewNew()
+    }, [])
 
     const handleClose = useCallback(() => {
-        reset()
-    }, [reset])
+        setPrintFlag(0)
+    }, [setPrintFlag])
 
 
     return (
@@ -86,4 +53,4 @@ const ShowPAge = ({ open, lastVisitId, reset, flag }) => {
     )
 }
 
-export default memo(ShowPAge)
+export default ShowPrintNew

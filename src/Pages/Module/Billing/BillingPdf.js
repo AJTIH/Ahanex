@@ -2,8 +2,6 @@ import React from 'react';
 import { format } from 'date-fns';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-
-// Import your logo image as a base64 encoded string
 import logo from './logo.png'; // adjust the path to your logo file
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
