@@ -18,7 +18,7 @@ import Table from '@mui/joy/Table';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShowPrint from './ShowPrint'
 import { useNavigate } from 'react-router-dom'
-import ShowPrintNew from './ShowPrintNew'
+
 const Billing = () => {
     const navigate = useNavigate()
     const [pateintid, setPatientId] = useState('')
@@ -241,17 +241,11 @@ const Billing = () => {
     }, [])
 
 
-    const [printflag, setPrintFlag] = useState(0)
-    const Printdemo = useCallback(() => {
-        setPrintFlag(1)
-    }, [])
 
 
     return (
         <Box sx={{ width: "100%", p: 5 }}>
-            {
-                printflag === 1 ? <ShowPrintNew open={printflag} reset={reset} setPrintFlag={setPrintFlag} /> : null
-            }
+
             {modal === 1 ? <ShowPrint open={modalFlag} lastVisitId={lastVisitId} reset={reset}
                 patient={patient} pateintid={pateintid} sumProcedureRate={sumProcedureRate} /> : null}
             <ToastContainer />
@@ -524,9 +518,6 @@ const Billing = () => {
                             </Box>
                             <Box sx={{ pl: 2 }}>
                                 <Button color="primary" variant="contained" onClick={CloseMAster}>Close</Button>
-                            </Box>
-                            <Box sx={{ pl: 2 }}>
-                                <Button color="primary" variant="contained" onClick={Printdemo}>Print</Button>
                             </Box>
                         </Box>
 
