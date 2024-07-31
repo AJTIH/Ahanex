@@ -40,7 +40,7 @@ const SalutationDropDown = ({ salutn, setSalutn }) => {
             fullWidth
             variant="outlined"
             color="primary"
-            sx={{ height: 24, p: 0, m: 0, lineHeight: 1.2 }}
+            sx={{ height: 30, p: 0, m: 0, lineHeight: 1.2 }}
         >
             <MenuItem value={0} disabled>
                 Select Salutation

@@ -23,9 +23,9 @@ export const TokenBillPdfView = (data, printingdata) => {
                 layout: 'noBorders'
             };
         },
-        // pageMargins: [50, 80, 130, 40],
-        // pageSize: 'A5',
-        // pageOrientation: 'landscape',
+        pageMargins: [50, 80, 130, 40],
+        pageSize: 'A5',
+        pageOrientation: 'landscape',
         // header: {
         //     columns: [
         //         {

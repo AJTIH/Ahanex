@@ -26,14 +26,30 @@ export const TokenBillPdfViewWithRegFee = (data, printingdata) => {
             };
         },
         pageMargins: [50, 80, 130, 40],
+        pageSize: 'A5',
+        pageOrientation: 'landscape',
         header: {
             columns: [
+
                 {
-                    image: 'snow', fit: [150, 150],
+                    margin: [20, 15, 0, 0],
+                    style: 'tableExample',
+                    table: {
+                        widths: [100, 250],
+                        body: [
+                            [{
 
-                    // margin: [25, 15, 0, 0],
+                                image: 'snow', fit: [150, 150],
+                                // margin: [25, 15, 0, 0],
+                            },
+                            ],
 
+
+                        ]
+                    },
+                    layout: 'noBorders'
                 },
+
             ],
         },
 

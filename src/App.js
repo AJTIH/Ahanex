@@ -14,6 +14,7 @@ const Doctor = lazy(() => import('./Pages/Setting/Master/Doctor'));
 const Settings = lazy(() => import('./Pages/Setting/Master/Settings'));
 const ProcedureMaster = lazy(() => import('./Pages/Setting/Master/ProcedureMaster'));
 const Appoinment = lazy(() => import('./Pages/Module/Appoinment/AppoinmentMain'))
+const UserCreation = lazy(() => import('./Pages/Setting/UserCreation/UserCreationMast'))
 
 function App() {
   const router = createBrowserRouter([
@@ -30,6 +31,7 @@ function App() {
             { path: 'Settings', element: <Settings /> },
             { path: 'ProcedureMaster', element: <ProcedureMaster /> },
             { path: 'Appoinment', element: <Appoinment /> },
+            { path: 'UserCreation', element: <UserCreation /> },
           ]
         },
       ]

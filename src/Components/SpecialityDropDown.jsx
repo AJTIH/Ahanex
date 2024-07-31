@@ -34,7 +34,7 @@ const SpecialityDropDown = ({ speciality, setspeciality }) => {
                     size="small"
                     fullWidth
                     variant='outlined'
-                    sx={{ height: 24, p: 0, m: 0, lineHeight: 1.200 }}
+                    sx={{ height: 27, p: 0, m: 0, lineHeight: 1.200 }}
                 >
                     <MenuItem value={0} disabled >Select Speciality</MenuItem>
                     {
