@@ -1,15 +1,12 @@
 import { format } from "date-fns";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-// import logos from '../Billing/logo.png';
-
-
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const ProcedureBillPdfView = (pateintid, patient, lastVisitId, dataset, sumProcedureRate, printingdata) => {
 
     const { patient_name, patient_address, patient_district, patient_mobile, patient_age } = patient
-    const { clinic_name, clinic_address, clinic_mobile, clinic_mail } = printingdata[0]
+    const { clinic_name, clinic_address, clinic_mobile } = printingdata[0]
 
     const xx = format(new Date(), "dd-MM-yyyy")
 
@@ -26,21 +23,6 @@ export const ProcedureBillPdfView = (pateintid, patient, lastVisitId, dataset, s
             };
         },
         pageMargins: [50, 80, 130, 40],
-        // header: {
-        //     columns: [
-        //         {
-        //             image: logos, // Your logo image as a base64 encoded string
-        //             width: 80, // Width of the logo
-        //         },
-        //         {
-        //             text: clinic_name,
-        //             style: 'header',
-        //             bold: true,
-        //             alignment: 'center',
-        //             margin: [10, 10],
-        //         },
-        //     ],
-        // },
         footer: function (currentPage, pageCount) {
             return {
                 margin: 5,
@@ -58,7 +40,30 @@ export const ProcedureBillPdfView = (pateintid, patient, lastVisitId, dataset, s
             };
 
         },
+        header: {
+            columns: [
 
+                {
+                    margin: [20, 15, 0, 0],
+                    style: 'tableExample',
+                    table: {
+                        widths: [100, 250],
+                        body: [
+                            [{
+
+                                image: 'snow', fit: [150, 150],
+                                // margin: [25, 15, 0, 0],
+                            },
+                            ],
+
+
+                        ]
+                    },
+                    layout: 'noBorders'
+                },
+
+            ],
+        },
         content: [
             {
                 fontSize: 15,

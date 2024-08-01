@@ -1,4 +1,4 @@
-import React, { useEffect, memo, useState, useCallback, useMemo } from 'react'
+import React, { memo, useState, useCallback, useMemo } from 'react'
 import { axioslogin } from '../../../AxiosConfig/Axios'
 import { warningNotify } from '../../../Components/CommonCode'
 import { Box, } from '@mui/material'
@@ -16,12 +16,13 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
     const [tableData, setTabledata] = useState([])
     const [regmaster, setRegmaster] = useState({
+        patient_id: '',
         patient_name: '',
         patient_address: '',
         patient_mobile: ''
     })
     //Destructuring
-    const { patient_name, patient_address, patient_mobile } = regmaster
+    const { patient_id, patient_name, patient_address, patient_mobile } = regmaster
     const updateregistrationState = useCallback((e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setRegmaster({ ...regmaster, [e.target.name]: value })
@@ -29,11 +30,12 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
 
     const postData = useMemo(() => {
         return {
+            patient_id: patient_id,
             patient_name: patient_name,
             patient_address: patient_address,
             patient_mobile: patient_mobile
         }
-    }, [patient_name, patient_address, patient_mobile])
+    }, [patient_name, patient_address, patient_mobile, patient_id])
     const searchbyCondtn = useCallback(() => {
 
 
@@ -67,29 +69,60 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
                 warningNotify("No Patient Found in given condition")
             }
         }
-
-        if (patient_name !== '' && patient_address === '' && patient_mobile === '') {
-            getBypatientName(postData)
-        } else if (patient_name === '' && patient_address !== '' && patient_mobile === '') {
-            getByPatientAddress(postData)
-        } else if (patient_name === '' && patient_address === '' && patient_mobile !== '') {
-            getByPatientMobileno(postData)
+        const getByPatientId = async (postData) => {
+            const result = await axioslogin.post('/patientRegistration/searchById', postData)
+            const { data, success } = result.data
+            if (success === 1) {
+                setTabledata(data)
+            }
+            else {
+                warningNotify("No Patient Found in given condition")
+            }
         }
 
+        const getByNameAddress = async (postData) => {
+            const result = await axioslogin.post('/patientRegistration/searchNameAddress', postData)
+            const { data, success } = result.data
+            if (success === 1) {
+                setTabledata(data)
+            }
+            else {
+                warningNotify("No Patient Found in given condition")
+            }
+        }
 
-
-
-
+        const getByNameMobile = async (postData) => {
+            const result = await axioslogin.post('/patientRegistration/searchNameMobile', postData)
+            const { data, success } = result.data
+            if (success === 1) {
+                setTabledata(data)
+            }
+            else {
+                warningNotify("No Patient Found in given condition")
+            }
+        }
+        if (patient_id === '' && patient_name !== '' && patient_address === '' && patient_mobile === '') {
+            getBypatientName(postData)
+        } else if (patient_id === '' && patient_name === '' && patient_address !== '' && patient_mobile === '') {
+            getByPatientAddress(postData)
+        } else if (patient_id === '' && patient_name === '' && patient_address === '' && patient_mobile !== '') {
+            getByPatientMobileno(postData)
+        } else if (patient_id !== '' && patient_name === '' && patient_address === '' && patient_mobile === '') {
+            getByPatientId(postData)
+        } else if (patient_id === '' && patient_name !== '' && patient_address !== '' && patient_mobile === '') {
+            getByNameAddress(postData)
+        } else if (patient_id === '' && patient_name !== '' && patient_address === '' && patient_mobile !== '') {
+            getByNameMobile(postData)
+        }
         else {
             warningNotify("Please Select any condition before search")
         }
 
-
-    }, [postData, patient_name, patient_address, patient_mobile])
+    }, [postData, patient_name, patient_address, patient_mobile, patient_id])
 
     const RefreshFunctn = useCallback(() => {
-
         const refreshdata = {
+            patient_id: '',
             patient_name: '',
             patient_address: '',
             patient_mobile: ''
@@ -113,7 +146,16 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
                         display: "flex",
                         flexDirection: "row", pb: 2
                     }}>
-                        <Box sx={{ pl: 0.8, width: "20%", cursor: "pointer" }}></Box>
+                        <Box sx={{ pl: 0.8, width: "15%", cursor: "pointer" }}></Box>
+                        <Box sx={{ pl: 0.8, width: "30%", cursor: "pointer" }}>
+                            <CustomInput placeholder={"Patient iD"}
+                                type="text"
+                                size="sm"
+                                name="patient_id"
+                                value={patient_id}
+                                handleChange={updateregistrationState}
+                            />
+                        </Box>
                         <Box sx={{ pl: 0.8, width: "30%", cursor: "pointer" }}>
                             <CustomInput placeholder={"Patient Name"}
                                 type="text"
@@ -147,7 +189,7 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
                                 <SearchOutlinedIcon color='primary' fontSize='small' />
                             </CusIconButton>
                         </Box>
-                        <Box sx={{ width: '2%' }}>
+                        <Box sx={{ width: '2%', pl: 0.5 }}>
                             <CusIconButton size="sm" variant="outlined" clickable="true" onClick={RefreshFunctn} >
                                 <RefreshIcon color='primary' fontSize='small' />
                             </CusIconButton>
@@ -209,4 +251,4 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
     )
 }
 
-export default RegistrationTable
+export default memo(RegistrationTable)

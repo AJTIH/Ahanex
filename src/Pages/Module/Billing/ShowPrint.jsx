@@ -34,15 +34,11 @@ const ShowPrint = ({ open, lastVisitId, reset, patient, pateintid, sumProcedureR
             }
         }
         getSettingData()
-
-
-
         getDataForPrint(lastVisitId)
     }, [lastVisitId])
 
     const printtoken = useCallback(() => {
         if (dataset.length !== 0) {
-            // BillPdfView(pateintid, patient, lastVisitId, dataset, sumProcedureRate, printingdata)
             ProcedureBillPdfView(pateintid, patient, lastVisitId, dataset, sumProcedureRate, printingdata)
         }
     }, [dataset, patient, pateintid])
@@ -70,13 +66,11 @@ const ShowPrint = ({ open, lastVisitId, reset, patient, pateintid, sumProcedureR
                 < DialogContentText id="alert-dialog-slide-descriptiona">
                     Are you want to print
                 </DialogContentText>
-
             </DialogContent>
             <DialogActions>
                 <Button onClick={printtoken} color="secondary" >Print</Button>
                 <Button onClick={handleClose} color="secondary" >Close</Button>
             </DialogActions>
-
         </Dialog>
     )
 }

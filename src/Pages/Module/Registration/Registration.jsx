@@ -165,7 +165,6 @@ const Registration = () => {
         }
     }, [salutn, patient_name, patient_address, patient_place, patient_pincode, patient_district, patient_mobile, patient_dob, patient_age,
         patient_month, patient_day, patient_slno])
-    console.log(patchdata);
     const reset = useCallback(() => {
         setSalutn(0)
         const resetdetail = {

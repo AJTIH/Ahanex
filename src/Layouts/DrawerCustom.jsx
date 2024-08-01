@@ -46,6 +46,12 @@ const DrawerCustom = ({ open, setOpen }) => {
                     icon: <OpenInNew fontSize='small' className='text-[#636b74]' />,
                     navigate: 'Billing'
                 },
+                {
+                    slno: 4,
+                    name: 'Appoinment',
+                    icon: <OpenInNew fontSize='small' className='text-[#636b74]' />,
+                    navigate: 'Appoinment'
+                },
             ]
         },
         {
@@ -70,6 +76,12 @@ const DrawerCustom = ({ open, setOpen }) => {
                     name: 'Procedure Master',
                     icon: <OpenInNew fontSize='small' className='text-[#636b74]' />,
                     navigate: 'ProcedureMaster'
+                },
+                {
+                    slno: 4,
+                    name: 'User Creation',
+                    icon: <OpenInNew fontSize='small' className='text-[#636b74]' />,
+                    navigate: 'UserCreation'
                 },
             ]
         },

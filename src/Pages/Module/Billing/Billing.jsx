@@ -18,6 +18,7 @@ import Table from '@mui/joy/Table';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShowPrint from './ShowPrint'
 import { useNavigate } from 'react-router-dom'
+
 const Billing = () => {
     const navigate = useNavigate()
     const [pateintid, setPatientId] = useState('')
@@ -238,6 +239,9 @@ const Billing = () => {
     const CloseMAster = useCallback(() => {
         navigate('/Home')
     }, [])
+
+
+
 
     return (
         <Box sx={{ width: "100%", p: 5 }}>
