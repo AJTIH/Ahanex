@@ -110,12 +110,12 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                                 <SearchOutlinedIcon color='primary' fontSize='small' />
                             </CusIconButton>
                         </Box>
-                        <Box sx={{ width: '2%' }}>
+                        <Box sx={{ width: '2%', pl: 1, pr: 1 }}>
                             <CusIconButton size="sm" variant="outlined" clickable="true" onClick={RefreshFunctn} >
                                 <RefreshIcon color='primary' fontSize='small' />
                             </CusIconButton>
                         </Box>
-                        <Box sx={{ width: '3%', pl: 0.5 }}>
+                        <Box sx={{ width: '3%', pl: 2 }}>
                             <CusIconButton size="sm" variant="outlined" clickable="true" onClick={CloseFnctn} >
                                 <CloseIcon color='primary' fontSize='small' />
                             </CusIconButton>
@@ -134,6 +134,7 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                                         <th style={{ width: '30%', align: "center" }}>Procedure Name</th>
                                         <th style={{ width: '30%', align: "center" }}>Procedure Code</th>
                                         <th style={{ width: '30%', align: "center" }}>Procedure rate </th>
+                                        <th style={{ width: '30%', align: "center" }}>Procedure Category</th>
                                         <th style={{ width: '10%', align: "center" }}>Status </th>
                                         <th style={{ width: '10%', align: "center" }}>Edit</th>
                                     </tr>
@@ -151,6 +152,7 @@ const ProcedurMastTable = ({ rowSelect, CloseFnctn }) => {
                                             <td> {val.procedure_name}</td>
                                             <td> {val.procedure_code}</td>
                                             <td> {val.procedure_rate}</td>
+                                            <td> {val.procedure_catgry_name}</td>
                                             <td> {val.status1}</td>
                                             <td>
                                                 <EditIcon size={6} color='primary' onClick={() => rowSelect(val)} />

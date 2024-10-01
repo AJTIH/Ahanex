@@ -145,12 +145,12 @@ const DoctorMastTable = ({ rowSelect, CloseFnctn }) => {
                                 <SearchOutlinedIcon color='primary' fontSize='small' />
                             </CusIconButton>
                         </Box>
-                        <Box sx={{ width: '2%' }}>
+                        <Box sx={{ width: '2%', pl: 1, pr: 1 }}>
                             <CusIconButton size="sm" variant="outlined" clickable="true" onClick={RefreshFunctn} >
                                 <RefreshIcon color='primary' fontSize='small' />
                             </CusIconButton>
                         </Box>
-                        <Box sx={{ width: '3%', pl: 0.5 }}>
+                        <Box sx={{ width: '3%', pl: 2 }}>
                             <CusIconButton size="sm" variant="outlined" clickable="true" onClick={CloseFnctn} >
                                 <CloseIcon color='primary' fontSize='small' />
                             </CusIconButton>

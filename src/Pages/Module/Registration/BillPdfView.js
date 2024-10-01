@@ -4,10 +4,10 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const TokenBillPdfView = (data, printingdata) => {
-    const { patient_id, token_no, fee,
+    const { uhid, token_no, fee,
         patient_name, patient_address, patient_pincode, patient_district,
         patient_mobile, patient_dob, patient_age, doctor_name } = data[0]
-    const { clinic_name, clinic_address, clinic_mobile } = printingdata[0]
+    const { clinic_name, clinic_address, clinic_mobile, clinic_landno } = printingdata[0]
     const dob = format(new Date(patient_dob), "dd-MM-yyyy")
     const xx = format(new Date(), "dd-MM-yyyy")
     var doc = {
@@ -28,39 +28,28 @@ export const TokenBillPdfView = (data, printingdata) => {
         pageOrientation: 'landscape',
         // header: {
         //     columns: [
+
         //         {
-        //             image: 'snow', fit: [150, 150],
+        //             margin: [20, 15, 0, 0],
+        //             style: 'tableExample',
+        //             table: {
+        //                 widths: [100, 250],
+        //                 body: [
+        //                     [{
 
-        //             // margin: [25, 15, 0, 0],
+        //                         image: 'snow', fit: [150, 150],
+        //                         // margin: [25, 15, 0, 0],
+        //                     },
+        //                     ],
 
+
+        //                 ]
+        //             },
+        //             layout: 'noBorders'
         //         },
+
         //     ],
         // },
-        header: {
-            columns: [
-
-                {
-                    margin: [20, 15, 0, 0],
-                    style: 'tableExample',
-                    table: {
-                        widths: [100, 250],
-                        body: [
-                            [{
-
-                                image: 'snow', fit: [150, 150],
-                                // margin: [25, 15, 0, 0],
-                            },
-                            ],
-
-
-                        ]
-                    },
-                    layout: 'noBorders'
-                },
-
-            ],
-        },
-
 
         footer: function (currentPage, pageCount) {
             return {
@@ -85,29 +74,37 @@ export const TokenBillPdfView = (data, printingdata) => {
 
             {
                 fontSize: 15,
-                margin: [80, -5, 0, 0],
+                margin: [80, -55, 0, 0],
                 text: clinic_name,
                 style: 'header', bold: true,
                 alignment: 'center',
             },
             {
                 fontSize: 13,
-                margin: [80, 0, 0, 0],
+                margin: [100, 0, 0, 0],
                 text: clinic_address,
                 style: 'header',
                 alignment: 'center',
             },
-
             {
-                fontSize: 13,
-                margin: [80, 0, 0, 0],
-                text: clinic_mobile,
-                style: 'header',
-                alignment: 'center',
+                margin: [160, 0, 0, 0],
+                style: 'tableExample',
+                table: {
+                    widths: [20, 67.5, 0, 100],
+                    body: [
+
+                        [{ text: "Ph:", fontSize: 12, font: 'Roboto' },
+                        { text: clinic_mobile, fontSize: 12, font: 'Roboto' },
+                        { text: "|", fontSize: 12, font: 'Roboto' },
+                        { text: clinic_landno, fontSize: 12, font: 'Roboto' }],
+
+                    ]
+                },
+                layout: 'noBorders'
             },
             {
                 fontSize: 17,
-                margin: [40, 5, 0, 0],
+                margin: [60, 5, 0, 0],
                 text: 'Visit Bill',
                 style: 'header', bold: true,
                 alignment: 'center',
@@ -119,8 +116,8 @@ export const TokenBillPdfView = (data, printingdata) => {
                 table: {
                     widths: [100, 150, 100, 150],
                     body: [
-                        [{ text: 'Patient Id', fontSize: 12, font: 'Roboto' },
-                        { text: patient_id, fontSize: 12, font: 'Roboto' },
+                        [{ text: 'UHID', fontSize: 12, font: 'Roboto' },
+                        { text: uhid, fontSize: 12, font: 'Roboto' },
                         { text: 'Date', fontSize: 12, font: 'Roboto' },
                         { text: xx, fontSize: 12, font: 'Roboto' }
                         ],
@@ -195,10 +192,10 @@ export const TokenBillPdfView = (data, printingdata) => {
         ],
 
 
-        images: {
-            snow: 'http://192.168.22.170/NAS/ahanex.png',
-            // snow: ahanex
-        }
+        //     images: {
+        //         snow: 'http://localhost/NAS/ahanex.png',
+        //        // snow: ahanex
+        //    }
     }
     pdfMake.createPdf(doc).open();
 }

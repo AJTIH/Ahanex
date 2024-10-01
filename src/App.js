@@ -15,6 +15,10 @@ const Settings = lazy(() => import('./Pages/Setting/Master/Settings'));
 const ProcedureMaster = lazy(() => import('./Pages/Setting/Master/ProcedureMaster'));
 const Appoinment = lazy(() => import('./Pages/Module/Appoinment/AppoinmentMain'))
 const UserCreation = lazy(() => import('./Pages/Setting/UserCreation/UserCreationMast'))
+const ProcedureCategoryMaster = lazy(() => import('./Pages/Setting/Master/ProcedureCategoryMast'))
+const CashClose = lazy(() => import('./Pages/Report/CashCloseReport'))
+const BillSearch = lazy(() => import('./Pages/Report/BillSearchReport'))
+//const CashClose = lazy(() => import('./Pages/Report/ExportToExcel'))
 
 function App() {
   const router = createBrowserRouter([
@@ -32,6 +36,9 @@ function App() {
             { path: 'ProcedureMaster', element: <ProcedureMaster /> },
             { path: 'Appoinment', element: <Appoinment /> },
             { path: 'UserCreation', element: <UserCreation /> },
+            { path: 'ProcedureCategoryMaster', element: <ProcedureCategoryMaster /> },
+            { path: 'CashClose', element: <CashClose /> },
+            { path: 'BillSearch', element: <BillSearch /> },
           ]
         },
       ]

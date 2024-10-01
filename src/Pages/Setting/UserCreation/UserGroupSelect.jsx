@@ -7,14 +7,12 @@ import { axioslogin } from '../../../AxiosConfig/Axios'
 
 const UserGroupSelect = ({ userGroup, setUserGroup }) => {
 
-
     const [usergroup, setUsergroup] = useState([])
     useEffect(() => {
         const getUserGroup = async () => {
             const result = await axioslogin.get('/login/emp/userGroupget');
             const { success, data } = result.data
             if (success === 2) {
-                console.log(data);
                 setUsergroup(data)
             } else {
                 setUsergroup([])

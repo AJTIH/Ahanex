@@ -148,7 +148,7 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
                     }}>
                         <Box sx={{ pl: 0.8, width: "15%", cursor: "pointer" }}></Box>
                         <Box sx={{ pl: 0.8, width: "30%", cursor: "pointer" }}>
-                            <CustomInput placeholder={"Patient iD"}
+                            <CustomInput placeholder={"UHID"}
                                 type="text"
                                 size="sm"
                                 name="patient_id"
@@ -211,6 +211,7 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
                                     <tr>
                                         <th style={{ width: '15%', align: "center" }}>Sl No</th>
                                         <th style={{ width: '30%', align: "center" }}>Patient ID</th>
+                                        <th style={{ width: '30%', align: "center" }}>UHID ID</th>
                                         <th style={{ width: '30%', align: "center" }}>Patient Name</th>
                                         <th style={{ width: '30%', align: "center" }}>Patient Address </th>
                                         <th style={{ width: '30%', align: "center" }}>Patient Place </th>
@@ -230,6 +231,7 @@ const RegistrationTable = ({ rowSelect, CloseFnctn }) => {
                                         >
                                             <td> {index + 1}</td>
                                             <td> {val.patient_id}</td>
+                                            <td> {val.uhid}</td>
                                             <td> {val.patient_name}</td>
                                             <td> {val.patient_address}</td>
                                             <td> {val.patient_place}</td>

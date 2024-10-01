@@ -1,9 +1,10 @@
 import React from 'react'
 import Input from '@mui/joy/Input'
 
-const CustomInput = ({ placeholder, name, handleChange, value, type, disable }) => {
+const CustomInput = ({ slotProps, placeholder, name, handleChange, value, type, disable, min }) => {
     return (
         <Input
+            slotProps={slotProps}
             color="primary"
             value={value}
             placeholder={placeholder}
@@ -13,6 +14,7 @@ const CustomInput = ({ placeholder, name, handleChange, value, type, disable }) 
             size="sm"
             variant="outlined"
             disable={disable}
+            min={min}
         />
     )
 }

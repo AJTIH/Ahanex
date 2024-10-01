@@ -7,16 +7,27 @@ import CustomInput from '../../../Components/CustomInput'
 import Button from '@mui/material/Button';
 import { axioslogin } from '../../../AxiosConfig/Axios'
 import { succesNotify, warningNotify } from '../../../Components/CommonCode'
-import { differenceInYears, format, getMonth } from 'date-fns'
+import { differenceInYears, format, getMonth, getYear } from 'date-fns'
 import SpecialityDropDown from '../../../Components/SpecialityDropDown'
 import DoctorDropDownBySepciality from '../../../Components/DoctorDropDownBySepciality'
 import ShowPAge from './ShowPAge'
 import { useNavigate } from 'react-router-dom'
 import RegistrationTable from './RegistrationTable'
+import VacantToken from '../../../Components/VacantToken'
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const Registration = () => {
     const navigate = useNavigate()
     const [salutn, setSalutn] = useState(0)
+    const [radiovalue, setRadioValue] = useState('1')
+
+    //Radio button OnClick function starts
+    const updateRadioClick = useCallback(async (e) => {
+        e.preventDefault()
+        setRadioValue(e.target.value)
+    }, [])
     const [registration, setRegistration] = useState({
         patient_name: '',
         patient_address: '',
@@ -24,12 +35,12 @@ const Registration = () => {
         patient_pincode: '',
         patient_district: '',
         patient_mobile: '',
-        patient_slno: ''
-
+        patient_id: '',
+        old_uhid: ''
     })
     //Destructuring
     const { patient_name, patient_address, patient_place, patient_pincode, patient_district,
-        patient_mobile, patient_slno } = registration
+        patient_mobile, patient_id, old_uhid } = registration
     const updateregistrationState = useCallback((e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setRegistration({ ...registration, [e.target.name]: value })
@@ -60,6 +71,7 @@ const Registration = () => {
     const [doctor, setDoctor] = useState(0)
     const [patientId, setPatientId] = useState(0)
     const [lastToken, setLastToken] = useState(0)
+    const [TokenSelect, SetTokenSelect] = useState(0)
     const [feedetail, setFeeDetail] = useState({
         Fee: '',
         token_start: '',
@@ -120,6 +132,12 @@ const Registration = () => {
 
     }, [doctor])
 
+    const year = getYear(new Date())
+
+    const uhiddata = patientId.toString().padStart(6, '0') + '/' + "NHC" + '/' + year
+
+
+    //assetno: val.spare_asset_no + '/' + val.spare_asset_no_only.toString().padStart(6, '0'),
     const postData = useMemo(() => {
         return {
             patient_id: patientId,
@@ -134,20 +152,25 @@ const Registration = () => {
             patient_age: patient_age,
             patient_month: patient_month,
             patient_day: patient_day,
-            patient_no: patientId + 1
+            patient_no: patientId + 1,
+            uhid: uhiddata,
+            old_uhid: old_uhid
         }
     }, [salutn, patient_name, patient_address, patient_place, patient_pincode, patient_district, patient_mobile, patient_dob, patient_age,
-        patient_month, patient_day, patientId])
+        patient_month, patient_day, patientId, uhiddata, old_uhid])
 
     const postVisitMast = useMemo(() => {
         return {
             patient_id: patientId,
             visit_date: format(new Date(), "yyyy-MM-dd"),
             doctor_slno: doctor,
-            token_no: lastToken === 0 ? token_start : lastToken + 1,
-            fee: Fee
+            token_no: TokenSelect,
+            fee: Fee,
+            registration_fee: 1,
+            payment_mode_visit: radiovalue === '2' ? 2 : radiovalue === '3' ? 3 : 1
         }
-    }, [patientId, doctor, lastToken, token_start, Fee])
+    }, [patientId, doctor, TokenSelect, Fee, radiovalue])
+
     const patchdata = useMemo(() => {
         return {
             salutation: salutn === 0 ? null : salutn,
@@ -161,10 +184,11 @@ const Registration = () => {
             patient_age: patient_age,
             patient_month: patient_month,
             patient_day: patient_day,
-            patient_slno: patient_slno
+            patient_id: patient_id,
+            old_uhid: old_uhid
         }
     }, [salutn, patient_name, patient_address, patient_place, patient_pincode, patient_district, patient_mobile, patient_dob, patient_age,
-        patient_month, patient_day, patient_slno])
+        patient_month, patient_day, patient_id, old_uhid])
     const reset = useCallback(() => {
         setSalutn(0)
         const resetdetail = {
@@ -173,8 +197,8 @@ const Registration = () => {
             patient_place: '',
             patient_pincode: '',
             patient_district: '',
-            patient_mobile: ''
-
+            patient_mobile: '',
+            old_uhid: '',
         }
         setRegistration(resetdetail)
         setpatient_dob('')
@@ -198,6 +222,7 @@ const Registration = () => {
         setLastVisitId(0)
         setModal(0)
         setModalFlag(false)
+        SetTokenSelect(0)
         const getPatientId = async () => {
             const result = await axioslogin.get(`/patientRegistration/PatientIdget`)
             const { success, data } = result.data
@@ -247,7 +272,7 @@ const Registration = () => {
 
 
         if (editFlag === 0) {
-            if (patient_name !== '' && patient_address !== '' && patient_mobile !== '' && doctor != 0) {
+            if (patient_name !== '' && patient_address !== '' && patient_mobile !== '' && doctor != 0 && TokenSelect !== 0) {
                 if (token_end >= lastToken + 1) {
                     InsertPatientReg(postData).then((val) => {
                         const { success, message } = val
@@ -283,7 +308,7 @@ const Registration = () => {
     const rowSelect = useCallback((value) => {
         setEditFlag(2)
 
-        const { patient_slno, patient_id, salutation, patient_name,
+        const { patient_id, salutation, patient_name, old_uhid,
             patient_address, patient_place, patient_pincode, patient_district,
             patient_mobile, patient_dob, patient_age, patient_month, patient_day } = value
 
@@ -294,7 +319,8 @@ const Registration = () => {
             patient_pincode: patient_pincode,
             patient_district: patient_district,
             patient_mobile: patient_mobile,
-            patient_slno: patient_slno
+            patient_id: patient_id,
+            old_uhid: old_uhid
         }
         setRegistration(setFrmdata)
         setSalutn(salutation)
@@ -321,6 +347,9 @@ const Registration = () => {
                 editFlag === 1 ?
                     <RegistrationTable rowSelect={rowSelect} CloseFnctn={CloseFnctn} /> :
                     <Paper className='w-full flex flex-1 flex-col m-5 p-2  items-center justify-center gap-1 ' >
+                        <Box sx={{ width: '100%', display: 'flex', justifyContent: "center" }}>
+                            <Typography level='body-md' fontWeight='lg' sx={{ pb: 1 }} >REGISTRATION</Typography>
+                        </Box>
                         {modal === 1 ? <ShowPAge open={modalFlag} lastVisitId={lastVisitId} reset={reset} flag={1} /> : null}
                         <Box className="flex justify-center items-center w-3/4">
                             <Box className="flex-1 ml-2 " >
@@ -330,8 +359,7 @@ const Registration = () => {
                                 <CustomInput
                                     type="text"
                                     size="sm"
-                                    name="patientId"
-                                    value={patientId.toString().padStart(6, '0')}
+                                    value={uhiddata}
                                     disable={true}
                                 />
                             </Box>
@@ -444,6 +472,44 @@ const Registration = () => {
                                 </Box>
                             </Box>
                         </Box>
+                        <Box className="flex justify-center items-center w-3/4">
+                            <Box className="flex-1 ml-2 " >
+                                <Typography level='body-md' fontWeight='lg' >Place / Region</Typography>
+                            </Box>
+                            <Box className="flex-1" >
+                                <CustomInput placeholder={"Enter Old UHID"}
+                                    type="text"
+                                    size="sm"
+                                    name="old_uhid"
+                                    value={old_uhid}
+                                    handleChange={updateregistrationState} />
+                            </Box>
+                        </Box>
+                        {editFlag === 0 ?
+                            <Box className="flex justify-center items-center w-3/4">
+                                <Box className="flex-1 ml-2 " >
+                                    <Typography level='body-md' fontWeight='lg' >Mode of Payment</Typography>
+                                </Box>
+
+                                <Box className="flex-1" >
+
+                                    <RadioGroup
+                                        row
+                                        aria-labelledby="demo-row-radio-buttons-group-label"
+                                        name="row-radio-buttons-group"
+                                        value={radiovalue}
+                                        onChange={(e) => updateRadioClick(e)}
+                                    >
+                                        <FormControlLabel value='1' control={<Radio />} label="Cash" />
+                                        <FormControlLabel value='2' control={<Radio />} label="Card" />
+                                        <FormControlLabel value='3' control={<Radio />} label="Gpay" />
+                                    </RadioGroup>
+
+
+
+                                </Box>
+                            </Box> : null}
+
                         {editFlag === 0 ?
                             <Box sx={{ width: "100%", pl: 35 }}>
                                 <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
@@ -479,24 +545,12 @@ const Registration = () => {
                                         />
                                     </Box>
                                     <Box sx={{ pl: 2, width: "30%" }}>
-                                        <CustomInput
-                                            type="text"
-                                            size="sm"
-                                            value={doctor === 0 ? 0 : lastToken === 0 ? token_start : lastToken + 1}
-                                            disable={true}
-                                        />
+                                        <VacantToken doctor={doctor} TokenSelect={TokenSelect} SetTokenSelect={SetTokenSelect} />
                                     </Box>
                                 </Box>
-
                             </Box> : null}
 
-
-
-
-
                         <Box className="flex justify-center items-center w-3/4" sx={{ pt: 2 }}>
-
-
                             <Box sx={{ pl: 2 }}>
                                 <Button color="primary" variant="contained" onClick={submit} >Save</Button>
                             </Box>
@@ -516,7 +570,7 @@ const Registration = () => {
 
 
 
-        </Fragment>
+        </Fragment >
     )
 }
 

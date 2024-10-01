@@ -1,8 +1,7 @@
-import React, { useCallback, memo, useState, useMemo, useEffect, Fragment } from 'react'
+import React, { useCallback, memo, useState, useMemo, useEffect } from 'react'
 import { Box } from '@mui/joy'
 import { Paper } from '@mui/material'
 import Typography from '@mui/joy/Typography'
-import SalutationDropDown from '../../../Components/SalutationDropDown'
 import CustomInput from '../../../Components/CustomInput'
 import Button from '@mui/material/Button';
 import { axioslogin } from '../../../AxiosConfig/Axios'
@@ -16,11 +15,21 @@ import CusIconButton from '../../../Components/CusIconButton';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import ShowPAge from './ShowPAge'
 import { useNavigate } from 'react-router-dom'
+import VacantToken from '../../../Components/VacantToken'
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const Revisit = () => {
     const navigate = useNavigate()
     const [pateintid, setPatientId] = useState('')
+    const [radiovalue, setRadioValue] = useState('1')
 
+    //Radio button OnClick function starts
+    const updateRadioClick = useCallback(async (e) => {
+        e.preventDefault()
+        setRadioValue(e.target.value)
+    }, [])
     const [patient, setPatient] = useState({
         salutation: '',
         patient_name: '',
@@ -51,12 +60,15 @@ const Revisit = () => {
         token_end: '',
         renewal: ''
     })
-    const { Fee, token_start, token_end, renewal } = feedetail
+    const { Fee, token_end, renewal } = feedetail
     const [tokentaken, setTokenTaken] = useState(0)
     const [daysdiff, setDayDiff] = useState(0)
     const [modalFlag, setModalFlag] = useState(false)
     const [modal, setModal] = useState(0)
     const [lastVisitId, setLastVisitId] = useState(0)
+    const [lastregrenewal, setlastregrenewal] = useState(0)
+    const [reg_renewaldays, setreg_renewaldays] = useState(0)
+
     useEffect(() => {
         const getDoctortoken = async (doctor) => {
             const result = await axioslogin.get(`/patientRegistration/getDoctortokenDetail/${doctor}`)
@@ -85,8 +97,6 @@ const Revisit = () => {
             }
         }
 
-
-
         const getLastVistdate = async (postdata) => {
             const result = await axioslogin.post('/patientRegistration/lastVisitingDate', postdata)
             const { data, success } = result.data
@@ -101,6 +111,16 @@ const Revisit = () => {
             }
         }
 
+        const getRegistrationFee = async () => {
+            const result = await axioslogin.get(`/settingMaster`)
+            const { success, data } = result.data
+            if (success === 1) {
+                const { reg_renewaldays } = data[0]
+                setreg_renewaldays(reg_renewaldays)
+            } else {
+                warningNotify("Renewal Fee Not Given")
+            }
+        }
 
         getDoctortoken(doctor)
         getDoctorFee(doctor)
@@ -109,7 +129,21 @@ const Revisit = () => {
             doctor_slno: doctor
         }
         getLastVistdate(postData)
+        getRegistrationFee()
+
+
     }, [doctor, pateintid])
+    const [TokenSelect, SetTokenSelect] = useState(0)
+
+    const [appoinmentFlag, setAppoinmentFlag] = useState(0)
+    const [appoinmentdetail, setAppoinmentDetail] = useState({
+        appSpecialization: '',
+        appDoctr: '',
+        appToken: '',
+        AppFee: '',
+        Appdoctor_slno: ''
+    })
+    const { appSpecialization, appDoctr, appToken, AppFee, Appdoctor_slno } = appoinmentdetail
 
     const search = useCallback(() => {
         const getPatientDetails = async (pateintid) => {
@@ -153,9 +187,52 @@ const Revisit = () => {
                 setPatient(resetfrm)
             }
         }
-        getPatientDetails(pateintid)
 
-    }, [pateintid])
+
+        const getAppoinmentExistOrNot = async (pateintid) => {
+            const result = await axioslogin.get(`/patientRegistration/getAppoinmentVisitToday/${pateintid}`)
+            const { success, data } = result.data
+            if (success === 1) {
+                setTokenTaken(0)
+                setAppoinmentFlag(1)
+                const { visit_mast_slno, speciality_name, doctor_name, fee, token_no, doctor_slno } = data[0]
+                const setAppFrmData = {
+                    appSpecialization: speciality_name,
+                    appDoctr: doctor_name,
+                    appToken: token_no,
+                    AppFee: fee,
+                    Appdoctor_slno: doctor_slno
+                }
+                setAppoinmentDetail(setAppFrmData)
+                setLastVisitId(visit_mast_slno)
+            } else {
+                setTokenTaken(1)
+                setAppoinmentFlag(0)
+            }
+        }
+
+
+        const getLastRegRenewal = async (pateintid) => {
+            const result = await axioslogin.get(`/patientRegistration/getLastRegistrationRenewal/${pateintid}`)
+            const { success, data } = result.data
+            if (success === 1) {
+                const { lastregrenewal } = data[0]
+                const result = differenceInCalendarDays(new Date(), new Date(lastregrenewal))
+                if (reg_renewaldays < result) {
+                    setlastregrenewal(1)
+                } else {
+                    setlastregrenewal(0)
+                }
+
+            } else {
+                warningNotify("No procedure Category added yet!!!!!!")
+            }
+        }
+
+        getPatientDetails(pateintid)
+        getAppoinmentExistOrNot(pateintid)
+        getLastRegRenewal(pateintid)
+    }, [pateintid, reg_renewaldays])
 
     const reset = useCallback(() => {
         setPatientId('')
@@ -174,13 +251,10 @@ const Revisit = () => {
             patient_day: ''
 
         }
-
         setPatient(resetfrmdata)
-
         setspeciality(0)
         setDoctor(0)
         setLastToken(0)
-
         const resetfee = {
             Fee: '',
             token_start: '',
@@ -193,6 +267,15 @@ const Revisit = () => {
         setLastVisitId(0)
         setModal(0)
         setModalFlag(false)
+        setAppoinmentFlag(0)
+        const restApoinment = {
+            appSpecialization: '',
+            appDoctr: '',
+            appToken: '',
+            AppFee: '',
+            Appdoctor_slno: ''
+        }
+        setAppoinmentDetail(restApoinment)
     }, [])
 
     const referesh = useCallback(() => {
@@ -204,12 +287,20 @@ const Revisit = () => {
             patient_id: pateintid,
             visit_date: format(new Date(), "yyyy-MM-dd"),
             doctor_slno: doctor,
-            token_no: lastToken === 0 ? token_start : lastToken + 1,
-            fee: daysdiff <= renewal ? 0 : Fee
+            token_no: TokenSelect,
+            fee: daysdiff <= renewal ? 0 : Fee,
+            registration_fee: lastregrenewal === 1 ? 1 : 0,
+            payment_mode_visit: radiovalue === '2' ? 2 : radiovalue === '3' ? 3 : 1
         }
-    }, [pateintid, doctor, lastToken, token_start, Fee, daysdiff, renewal])
+    }, [pateintid, doctor, TokenSelect, Fee, daysdiff, renewal, lastregrenewal, radiovalue])
 
+    const patchdata = useMemo(() => {
+        return {
+            patient_id: pateintid,
+            doctor_slno: Appdoctor_slno
+        }
 
+    }, [pateintid, Appdoctor_slno])
 
     const submit = useCallback(() => {
 
@@ -227,47 +318,51 @@ const Revisit = () => {
             }
         }
 
-
-        if (tokentaken === 1) {
-            if (doctor !== 0) {
-                if (token_end >= lastToken + 1) {
-                    insertVistMaster(postVisitMast)
-                }
-                else {
-                    warningNotify("Token Finished")
-                }
+        const updateApoinment = async (patchdata) => {
+            const result = await axioslogin.patch('/Appoinments/updateAppoinmentSave', patchdata);
+            const { success, message } = result.data
+            if (success === 1) {
+                succesNotify("Visit saved")
+                setModal(1)
+                setModalFlag(true)
             } else {
-                warningNotify("Please select Doctor")
+                warningNotify(message)
             }
-
-        } else {
-            warningNotify("Please Select patient before save")
         }
-    }, [tokentaken, postVisitMast, token_end, lastToken, doctor])
 
+        if (appoinmentFlag === 0) {
+            if (tokentaken === 1) {
+                if (doctor !== 0) {
+                    if (token_end >= lastToken + 1) {
+                        insertVistMaster(postVisitMast)
+                    }
+                    else {
+                        warningNotify("Token Finished")
+                    }
+                } else {
+                    warningNotify("Please select Doctor")
+                }
 
+            } else {
+                warningNotify("Please Select patient before save")
+            }
+        }
+        else {
+            updateApoinment(patchdata)
 
+        }
+    }, [tokentaken, postVisitMast, token_end, lastToken, doctor, patchdata, appoinmentFlag])
 
-
-
-    const viewdata = useCallback(() => {
-
-    }, [])
 
 
     const CloseMAster = useCallback(() => {
         navigate('/Home')
     }, [])
 
-
-
-
     return (
-
-
         <Box sx={{ width: "100%", p: 5 }}>
             <ToastContainer />
-            {modal === 1 ? <ShowPAge open={modalFlag} lastVisitId={lastVisitId} reset={reset} flag={0} /> : null}
+            {modal === 1 ? <ShowPAge open={modalFlag} lastVisitId={lastVisitId} reset={reset} flag={lastregrenewal} /> : null}
             {/* 1st section starts */}
             <Paper sx={{
                 width: '100%',
@@ -284,10 +379,10 @@ const Revisit = () => {
 
                     <Box sx={{ width: '60%', display: 'flex', pt: 2.5, margin: 'auto ', pl: 10 }}>
                         <Box sx={{ pl: 0.8, width: "15%", cursor: "pointer" }}>
-                            <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550 }} >Pateint No</Typography>
+                            <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550 }} >UHID</Typography>
                         </Box>
                         <Box sx={{ pl: 0.8, width: "60%", cursor: "pointer" }}>
-                            <CustomInput placeholder={"Enter patient Id"}
+                            <CustomInput placeholder={"Enter UHID"}
                                 type="text"
                                 size="sm"
                                 name="pateintid"
@@ -452,10 +547,27 @@ const Revisit = () => {
                                 />
                             </Box>
                         </Box>
-
+                        <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
+                            <Box sx={{ width: "20%", pt: 0.5, }}>
+                                <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550 }} >Mode of Payment</Typography>
+                            </Box>
+                            <Box sx={{ width: "25%", pr: 1.5 }}>
+                                <RadioGroup
+                                    row
+                                    aria-labelledby="demo-row-radio-buttons-group-label"
+                                    name="row-radio-buttons-group"
+                                    value={radiovalue}
+                                    onChange={(e) => updateRadioClick(e)}
+                                >
+                                    <FormControlLabel value='1' control={<Radio />} label="Cash" />
+                                    <FormControlLabel value='2' control={<Radio />} label="Card" />
+                                    <FormControlLabel value='3' control={<Radio />} label="Gpay" />
+                                </RadioGroup>
+                            </Box>
+                        </Box>
 
                         {
-                            tokentaken === 1 ?
+                            tokentaken === 1 && appoinmentFlag === 0 ?
 
                                 <Box>
                                     <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
@@ -489,19 +601,71 @@ const Revisit = () => {
                                                 disable={true}
                                             />
                                         </Box>
-                                        <Box sx={{ width: "25%", pt: 0.5, }}>
-                                            <CustomInput
-                                                type="text"
-                                                size="sm"
-                                                value={doctor === 0 ? 0 : lastToken === 0 ? token_start : lastToken + 1}
-                                                disable={true}
-                                            />
+                                        <Box sx={{ pl: 2, pt: 0.7, width: "30%" }}>
+                                            <VacantToken doctor={doctor} TokenSelect={TokenSelect} SetTokenSelect={SetTokenSelect} />
                                         </Box>
                                     </Box>
 
-                                </Box> : null
-                        }
+                                </Box> :
 
+                                appoinmentFlag === 1 ?
+                                    <Box>
+                                        <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
+                                            <Box sx={{ width: "25%", pt: 0.5, }}>
+                                                <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, pl: 8 }} >Speciality</Typography>
+                                            </Box>
+                                            <Box sx={{ width: "25%", pt: 0.5, }}>
+                                                <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, pl: 8 }} >Doctor Name</Typography>
+                                            </Box>
+                                            <Box sx={{ width: "25%", pt: 0.5, }}>
+                                                <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, pl: 8 }} >Fee</Typography>
+                                            </Box>
+                                            <Box sx={{ width: "25%", pt: 0.5, }}>
+                                                <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, pl: 8 }} >Token No</Typography>
+                                            </Box>
+                                        </Box>
+
+                                        <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
+                                            <Box sx={{ width: "25%", pt: 0.5, pr: 1 }}>
+                                                <CustomInput
+                                                    type="text"
+                                                    size="sm"
+                                                    name="appSpecialization"
+                                                    value={appSpecialization}
+                                                    disable={true}
+                                                />
+                                            </Box>
+                                            <Box sx={{ width: "25%", pt: 0.5, pr: 1 }}>
+                                                <CustomInput
+                                                    type="text"
+                                                    size="sm"
+                                                    name="appDoctr"
+                                                    value={appDoctr}
+                                                    disable={true}
+                                                />
+                                            </Box>
+                                            <Box sx={{ width: "25%", pt: 0.5, pr: 1 }}>
+                                                <CustomInput
+                                                    type="text"
+                                                    size="sm"
+                                                    name="AppFee"
+                                                    value={AppFee}
+                                                    disable={true}
+                                                />
+                                            </Box>
+                                            <Box sx={{ width: "25%", pt: 0.5, }}>
+                                                <CustomInput
+                                                    type="text"
+                                                    size="sm"
+                                                    name="appToken"
+                                                    value={appToken}
+                                                    disable={true}
+                                                />
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                    : null
+                        }
 
                         <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 2, pb: 2 }}>
                             <Box sx={{ width: "40%", pt: 0.5, }}>
@@ -525,4 +689,4 @@ const Revisit = () => {
     )
 }
 
-export default Revisit
+export default memo(Revisit)

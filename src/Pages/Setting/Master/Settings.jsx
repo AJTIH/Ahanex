@@ -19,10 +19,12 @@ const Settings = () => {
         reg_renewal_fee: '',
         seting_mast_slno: 0,
         clinic_mail: '',
+        clinic_landno: '',
+        reg_renewaldays: ''
 
     })
     //Destructuring
-    const { clinic_name, clinic_address, clinic_mobile, reg_renewal_fee, seting_mast_slno, clinic_mail } = settingmaster
+    const { clinic_name, clinic_address, clinic_mobile, reg_renewal_fee, seting_mast_slno, clinic_mail, clinic_landno, reg_renewaldays } = settingmaster
     const updatesettingMaster = useCallback((e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setSettingmaster({ ...settingmaster, [e.target.name]: value })
@@ -33,14 +35,16 @@ const Settings = () => {
             const result = await axioslogin.get(`/settingMaster`)
             const { success, data } = result.data
             if (success === 1) {
-                const { clinic_name, clinic_address, clinic_mobile, reg_renewaldays, master_slno, clinic_mail } = data[0]
+                const { clinic_name, clinic_address, clinic_mobile, reg_renewaldays, master_slno, clinic_mail, clinic_landno, reg_renewal_fee } = data[0]
                 const frmset = {
                     clinic_name: clinic_name,
                     clinic_address: clinic_address,
                     clinic_mobile: clinic_mobile,
-                    reg_renewal_fee: reg_renewaldays,
+                    reg_renewaldays: reg_renewaldays,
                     clinic_mail: clinic_mail,
-                    seting_mast_slno: master_slno
+                    seting_mast_slno: master_slno,
+                    clinic_landno: clinic_landno,
+                    reg_renewal_fee: reg_renewal_fee
 
                 }
                 setSettingmaster(frmset)
@@ -51,7 +55,9 @@ const Settings = () => {
                     clinic_mobile: '',
                     reg_renewal_fee: '',
                     seting_mast_slno: 0,
-                    clinic_mail: ''
+                    clinic_mail: '',
+                    clinic_landno: '',
+                    reg_renewaldays: ''
                 }
                 setSettingmaster(reset)
             }
@@ -66,9 +72,11 @@ const Settings = () => {
             clinic_address: clinic_address,
             clinic_mobile: clinic_mobile,
             clinic_mail: clinic_mail,
-            reg_renewaldays: reg_renewal_fee
+            reg_renewaldays: reg_renewaldays,
+            clinic_landno: clinic_landno,
+            reg_renewal_fee: reg_renewal_fee
         }
-    }, [clinic_name, clinic_address, clinic_mobile, clinic_mail, reg_renewal_fee])
+    }, [clinic_name, clinic_address, clinic_mobile, clinic_mail, reg_renewal_fee, clinic_landno, reg_renewaldays])
 
     const patchData = useMemo(() => {
         return {
@@ -76,10 +84,12 @@ const Settings = () => {
             clinic_address: clinic_address,
             clinic_mobile: clinic_mobile,
             clinic_mail: clinic_mail,
-            reg_renewaldays: reg_renewal_fee,
+            reg_renewaldays: reg_renewaldays,
+            clinic_landno: clinic_landno,
+            reg_renewal_fee: reg_renewal_fee,
             master_slno: seting_mast_slno
         }
-    }, [clinic_name, clinic_address, clinic_mobile, clinic_mail, reg_renewal_fee, seting_mast_slno])
+    }, [clinic_name, clinic_address, clinic_mobile, clinic_mail, reg_renewal_fee, seting_mast_slno, clinic_landno, reg_renewaldays])
 
     const reset = useCallback(() => {
         const reset = {
@@ -88,7 +98,9 @@ const Settings = () => {
             clinic_mobile: '',
             reg_renewal_fee: '',
             seting_mast_slno: 0,
-            clinic_mail: ''
+            clinic_mail: '',
+            clinic_landno: '',
+            reg_renewaldays: ''
         }
         setSettingmaster(reset)
 
@@ -134,7 +146,9 @@ const Settings = () => {
         <Fragment>
             <ToastContainer />
             <Paper className='w-full flex flex-1 flex-col m-5 p-2  items-center justify-center gap-1 ' >
-
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: "center" }}>
+                    <Typography level='body-md' fontWeight='lg' sx={{ pb: 2 }} >Setting Master</Typography>
+                </Box>
                 <Box className="flex justify-center items-center w-3/4">
                     <Box className="flex-1 ml-2 " >
                         <Typography level='body-md' fontWeight='lg' >Clinic Name</Typography>
@@ -183,6 +197,21 @@ const Settings = () => {
                 </Box>
                 <Box className="flex justify-center items-center w-3/4">
                     <Box className="flex-1 ml-2 " >
+                        <Typography level='body-md' fontWeight='lg' >Clinic Landline No</Typography>
+                    </Box>
+                    <Box className="flex-1" >
+                        <CustomInput placeholder={'Enter Landline No '}
+                            type="text"
+                            size="sm"
+                            name="clinic_landno"
+                            value={clinic_landno}
+                            handleChange={updatesettingMaster}
+
+                        />
+                    </Box>
+                </Box>
+                <Box className="flex justify-center items-center w-3/4">
+                    <Box className="flex-1 ml-2 " >
                         <Typography level='body-md' fontWeight='lg' >Clinic Email.Address</Typography>
                     </Box>
                     <Box className="flex-1" >
@@ -207,6 +236,21 @@ const Settings = () => {
                             size="sm"
                             name="reg_renewal_fee"
                             value={reg_renewal_fee}
+                            handleChange={updatesettingMaster}
+
+                        />
+                    </Box>
+                </Box>
+                <Box className="flex justify-center items-center w-3/4">
+                    <Box className="flex-1 ml-2 " >
+                        <Typography level='body-md' fontWeight='lg' >Registration renewal Days</Typography>
+                    </Box>
+                    <Box className="flex-1" >
+                        <CustomInput placeholder={'Enter Registration renewal days'}
+                            type="text"
+                            size="sm"
+                            name="reg_renewaldays"
+                            value={reg_renewaldays}
                             handleChange={updatesettingMaster}
 
                         />

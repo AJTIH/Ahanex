@@ -20,6 +20,7 @@ const ShowPAge = ({ open, lastVisitId, reset, flag }) => {
         const getDataForPrint = async (lastVisitId) => {
             const result = await axioslogin.get(`/patientRegistration/lastInsertVistForPrint/${lastVisitId}`)
             const { success, data } = result.data
+
             if (success === 1) {
                 setDataset(data)
             } else {

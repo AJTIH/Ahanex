@@ -18,11 +18,22 @@ import Table from '@mui/joy/Table';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShowPrint from './ShowPrint'
 import { useNavigate } from 'react-router-dom'
+import ProcedureCatgryDropDown from '../../../Components/ProcedureCatgryDropDown'
+import ProcedurebyCategryDropDown from '../../../Components/ProcedurebyCategryDropDown'
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const Billing = () => {
     const navigate = useNavigate()
     const [pateintid, setPatientId] = useState('')
+    const [radiovalue, setRadioValue] = useState('1')
 
+    //Radio button OnClick function starts
+    const updateRadioClick = useCallback(async (e) => {
+        e.preventDefault()
+        setRadioValue(e.target.value)
+    }, [])
     const [patient, setPatient] = useState({
         salutation: '',
         patient_name: '',
@@ -34,7 +45,8 @@ const Billing = () => {
         patient_dob: '',
         patient_age: '',
         patient_month: '',
-        patient_day: ''
+        patient_day: '',
+        uhid: ''
     })
 
     const { salutation, patient_name, patient_address, patient_place, patient_pincode, patient_district,
@@ -53,6 +65,29 @@ const Billing = () => {
     const [modalFlag, setModalFlag] = useState(false)
     const [modal, setModal] = useState(0)
     const [lastVisitId, setLastVisitId] = useState(0)
+    const [procedureCode, setProcedureCode] = useState('')
+    const [procedurFlag, setprocedurFlag] = useState(0)
+    const [procedure_catgry_slno, setprocedure_catgry_slno] = useState(0)
+
+    const updateprocedureCode = useCallback((e) => {
+        setProcedureCode(e.target.value)
+        const getProcedureName = async (procedure) => {
+            const result = await axioslogin.get(`/Billing/getProcedureBsedOnCode/${procedure}`)
+            const { success, data } = result.data
+            if (success === 1) {
+                const { procedure_slno, procedure_name } = data[0]
+                setprocedurFlag(1)
+                setProcedure(procedure_slno)
+                setProcedrName(procedure_name)
+            } else {
+                // setProcedrName('')
+                // setRate(0)
+            }
+        }
+        getProcedureName(e.target.value)
+
+    }, [])
+
     useEffect(() => {
         const getProcdrDetail = async (procedure) => {
             const result = await axioslogin.get(`/Billing/getProcedureNameRate/${procedure}`)
@@ -76,7 +111,7 @@ const Billing = () => {
             if (success === 1) {
                 const { salutation, patient_name, patient_address, patient_place,
                     patient_pincode, patient_district, patient_mobile, patient_dob, patient_age, patient_month,
-                    patient_day } = data[0]
+                    patient_day, uhid } = data[0]
                 const frmdata = {
                     salutation: salutation,
                     patient_name: patient_name,
@@ -88,7 +123,8 @@ const Billing = () => {
                     patient_dob: patient_dob,
                     patient_age: patient_age,
                     patient_month: patient_month,
-                    patient_day: patient_day
+                    patient_day: patient_day,
+                    uhid: uhid
                 }
                 setPatient(frmdata)
             } else {
@@ -104,7 +140,8 @@ const Billing = () => {
                     patient_dob: '',
                     patient_age: '',
                     patient_month: '',
-                    patient_day: ''
+                    patient_day: '',
+                    uhid: ''
                 }
                 setPatient(resetfrm)
             }
@@ -127,7 +164,8 @@ const Billing = () => {
             patient_dob: '',
             patient_age: '',
             patient_month: '',
-            patient_day: ''
+            patient_day: '',
+            uhid: ''
         }
         setPatient(resetfrmdata)
         setProcedure(0)
@@ -139,6 +177,9 @@ const Billing = () => {
         setModalFlag(false)
         setModal(0)
         setLastVisitId(0)
+        setProcedureCode('')
+        setprocedurFlag(0)
+
     }, [])
 
     const referesh = useCallback(() => {
@@ -167,6 +208,10 @@ const Billing = () => {
                 setSlNo(SlNo + 1)
             }
             setDetlFlag(1)
+            setProcedureCode('')
+            setprocedure_catgry_slno(0)
+            setProcedure(0)
+            setprocedurFlag(0)
         }
 
     }, [procedure, produrname, produrname, rate])
@@ -183,9 +228,10 @@ const Billing = () => {
         return {
             patient_id: pateintid,
             bill_date: format(new Date(), "yyyy-MM-dd hh:mm:ss"),
-            bill_amount: sumProcedureRate
+            bill_amount: sumProcedureRate,
+            bill_payment_mode: radiovalue === '2' ? 2 : radiovalue === '3' ? 3 : 1
         }
-    }, [pateintid, sumProcedureRate])
+    }, [pateintid, sumProcedureRate, radiovalue])
 
     const submit = useCallback(() => {
         const insertBillMast = async (postVisitMast) => {
@@ -241,7 +287,12 @@ const Billing = () => {
     }, [])
 
 
-
+    const RefreshFunctn = useCallback(() => {
+        setProcedureCode('')
+        setprocedure_catgry_slno(0)
+        setProcedure(0)
+        setprocedurFlag(0)
+    }, [])
 
     return (
         <Box sx={{ width: "100%", p: 5 }}>
@@ -264,10 +315,10 @@ const Billing = () => {
 
                     <Box sx={{ width: '60%', display: 'flex', pt: 2.5, margin: 'auto ', pl: 10 }}>
                         <Box sx={{ pl: 0.8, width: "15%", cursor: "pointer" }}>
-                            <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550 }} >Pateint No</Typography>
+                            <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550 }} >UHID</Typography>
                         </Box>
                         <Box sx={{ pl: 0.8, width: "60%", cursor: "pointer" }}>
-                            <CustomInput placeholder={"Enter patient Id"}
+                            <CustomInput placeholder={"Enter UHID"}
                                 type="text"
                                 size="sm"
                                 name="pateintid"
@@ -432,24 +483,89 @@ const Billing = () => {
                                 />
                             </Box>
                         </Box>
+                        <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
+                            <Box sx={{ width: "20%", pt: 0.5, }}>
+                                <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550 }} >Mode of Payment</Typography>
+                            </Box>
+                            <Box sx={{ width: "25%", pr: 1.5 }}>
+                                <RadioGroup
+                                    row
+                                    aria-labelledby="demo-row-radio-buttons-group-label"
+                                    name="row-radio-buttons-group"
+                                    value={radiovalue}
+                                    onChange={(e) => updateRadioClick(e)}
+                                >
+                                    <FormControlLabel value='1' control={<Radio />} label="Cash" />
+                                    <FormControlLabel value='2' control={<Radio />} label="Card" />
+                                    <FormControlLabel value='3' control={<Radio />} label="Gpay" />
+                                </RadioGroup>
+                            </Box>
+                        </Box>
+                        <Box sx={{ width: "100%", display: 'flex', flexDirection: "column", pt: 1, pb: 1.5 }}>
 
-                        <Box>
                             <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
-                                <Box sx={{ width: "15%", pt: 0.5, }}>
+                                <Box sx={{ pl: 2, width: "15%" }}>
                                 </Box>
-                                <Box sx={{ width: "25%", pt: 0.5, }}>
-                                    <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, pl: 8 }} >Select Procedure</Typography>
+                                <Box sx={{ pl: 2, width: "25%" }}>
+                                    <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, textAlign: 'center' }}>Procedure Category</Typography>
                                 </Box>
-                                <Box sx={{ width: "25%", pt: 0.5, }}>
-                                    <ProcedureDropDown procedure={procedure} setProcedure={setProcedure} />
+                                <Box sx={{ pl: 2, width: "15%" }}>
+                                    <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, textAlign: 'center' }} >Procedure Code</Typography>
+
                                 </Box>
-                                <Box sx={{ width: "25%", pt: 0.5, pl: 2 }}>
+                                <Box sx={{ pl: 2, width: "25%" }}>
+                                    <Typography sx={{ fontSize: 13, fontFamily: 'sans-serif', fontWeight: 550, textAlign: 'center' }} >Procedure</Typography>
+                                </Box>
+
+                            </Box>
+                            <Box sx={{ width: "100%", display: 'flex', flexDirection: "row", pt: 1 }}>
+                                <Box sx={{ pl: 2, width: "15%" }}>
+                                </Box>
+                                <Box sx={{ pl: 2, width: "25%" }}>
+                                    <ProcedureCatgryDropDown procedure_catgry_slno={procedure_catgry_slno} setprocedure_catgry_slno={setprocedure_catgry_slno} />
+                                </Box>
+                                <Box sx={{ pl: 2, width: "15%" }}>
+                                    <CustomInput
+                                        type="text"
+                                        size="sm"
+                                        name="procedureCode"
+                                        value={procedureCode}
+                                        handleChange={updateprocedureCode}
+
+                                    />
+                                </Box>
+                                <Box sx={{ pl: 2, width: "25%" }}>
+                                    {procedurFlag === 1 ?
+                                        <CustomInput
+                                            type="text"
+                                            size="sm"
+                                            name="produrname"
+                                            value={produrname}
+                                            disable={true}
+                                        /> : <Box>
+                                            {procedure_catgry_slno === 0 ?
+                                                <ProcedureDropDown procedure={procedure} setProcedure={setProcedure} /> :
+                                                <ProcedurebyCategryDropDown procedure={procedure} setProcedure={setProcedure} procedure_catgry_slno={procedure_catgry_slno} />
+
+                                            }
+
+                                        </Box>
+
+                                    }
+                                </Box>
+                                <Box sx={{ pl: 2, width: "4%" }}>
                                     <CusIconButton size="sm" variant="outlined" clickable="true" color="primary" onClick={AddProcedure} >
                                         <AddCircleOutlineIcon fontSize='small' />
                                     </CusIconButton>
                                 </Box>
-
+                                <Box sx={{ pl: 2, width: "4%" }}>
+                                    <CusIconButton size="sm" variant="outlined" clickable="true" color="primary" onClick={RefreshFunctn} >
+                                        <RefreshIcon fontSize='small' />
+                                    </CusIconButton>
+                                </Box>
                             </Box>
+
+
 
 
                         </Box>

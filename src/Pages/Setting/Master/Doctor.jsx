@@ -144,7 +144,9 @@ const Doctor = () => {
             <ToastContainer />
             {editFlag === 1 ? <DoctorMastTable rowSelect={rowSelect} CloseFnctn={CloseFnctn} /> :
                 <Paper className='w-full flex flex-1 flex-col m-5 p-2  items-center justify-center gap-1 ' >
-
+                    <Box sx={{ width: '100%', display: 'flex', justifyContent: "center" }}>
+                        <Typography level='body-md' fontWeight='lg' sx={{ pb: 2 }} >Doctor Master</Typography>
+                    </Box>
                     <Box className="flex justify-center items-center w-3/4">
                         <Box className="flex-1 ml-2 " >
                             <Typography level='body-md' fontWeight='lg' >Doctor Name</Typography>

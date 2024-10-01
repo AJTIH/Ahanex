@@ -1,14 +1,16 @@
+
 import { format } from "date-fns";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-export const ProcedureBillPdfView = (pateintid, patient, lastVisitId, dataset, sumProcedureRate, printingdata) => {
+export const ProcedureBillPdfView = (patient, lastVisitId, dataset, sumProcedureRate, printingdata) => {
 
-    const { patient_name, patient_address, patient_district, patient_mobile, patient_age } = patient
-    const { clinic_name, clinic_address, clinic_mobile } = printingdata[0]
+    const { patient_name, patient_address, patient_district, patient_mobile, patient_age, uhid } = patient
+    const { clinic_name, clinic_address, clinic_mobile, clinic_landno } = printingdata[0]
 
     const xx = format(new Date(), "dd-MM-yyyy")
+
 
     var doc = {
         background: function (currentPage, pageSize) {
@@ -19,10 +21,62 @@ export const ProcedureBillPdfView = (pateintid, patient, lastVisitId, dataset, s
                     bold: true,
                     body: [['']]
                 },
-                margin: 30
+                margin: 30,
+                layout: 'noBorders'
             };
         },
         pageMargins: [50, 80, 130, 40],
+        pageSize: 'A5',
+        pageOrientation: 'landscape',
+        header: {
+            columns: [
+
+                {
+                    margin: [20, 15, 0, 0],
+                    style: 'tableExample',
+                    table: {
+                        widths: [100, 250],
+                        body: [
+                            {
+                                fontSize: 15,
+                                margin: [80, -55, 0, 0],
+                                text: clinic_name,
+                                style: 'header', bold: true,
+                                alignment: 'center',
+                            },
+                            {
+                                fontSize: 13,
+                                margin: [100, 0, 0, 0],
+                                text: clinic_address,
+                                style: 'header',
+                                alignment: 'center',
+                            },
+                            {
+                                margin: [160, 0, 0, 0],
+                                style: 'tableExample',
+                                table: {
+                                    widths: [20, 67.5, 0, 100],
+                                    body: [
+
+                                        [{ text: "Ph:", fontSize: 12, font: 'Roboto' },
+                                        { text: clinic_mobile, fontSize: 12, font: 'Roboto' },
+                                        { text: "|", fontSize: 12, font: 'Roboto' },
+                                        { text: clinic_landno, fontSize: 12, font: 'Roboto' }],
+
+                                    ]
+                                },
+                                layout: 'noBorders'
+                            },
+
+
+                        ]
+                    },
+                    layout: 'noBorders'
+                },
+
+            ],
+        },
+
         footer: function (currentPage, pageCount) {
             return {
                 margin: 5,
@@ -40,68 +94,45 @@ export const ProcedureBillPdfView = (pateintid, patient, lastVisitId, dataset, s
             };
 
         },
-        header: {
-            columns: [
-
-                {
-                    margin: [20, 15, 0, 0],
-                    style: 'tableExample',
-                    table: {
-                        widths: [100, 250],
-                        body: [
-                            [{
-
-                                image: 'snow', fit: [150, 150],
-                                // margin: [25, 15, 0, 0],
-                            },
-                            ],
-
-
-                        ]
-                    },
-                    layout: 'noBorders'
-                },
-
-            ],
-        },
         content: [
-            {
-                fontSize: 15,
-                margin: [90, 0, 0, 0],
-                text: clinic_name,
-                style: 'header', bold: true,
-                alignment: 'center',
-            },
-            {
-                fontSize: 13,
-                margin: [50, 0, 0, 0],
-                text: clinic_address,
-                style: 'header',
-                alignment: 'center',
-            },
+            // {
+            //     fontSize: 15,
+            //     margin: [80, -55, 0, 0],
+            //     text: clinic_name,
+            //     style: 'header', bold: true,
+            //     alignment: 'center',
+            // },
+            // {
+            //     fontSize: 13,
+            //     margin: [100, 0, 0, 0],
+            //     text: clinic_address,
+            //     style: 'header',
+            //     alignment: 'center',
+            // },
+            // {
+            //     margin: [160, 0, 0, 0],
+            //     style: 'tableExample',
+            //     table: {
+            //         widths: [20, 67.5, 0, 100],
+            //         body: [
 
+            //             [{ text: "Ph:", fontSize: 12, font: 'Roboto' },
+            //             { text: clinic_mobile, fontSize: 12, font: 'Roboto' },
+            //             { text: "|", fontSize: 12, font: 'Roboto' },
+            //             { text: clinic_landno, fontSize: 12, font: 'Roboto' }],
+
+            //         ]
+            //     },
+            //     layout: 'noBorders'
+            // },
             {
-                fontSize: 13,
-                margin: [40, 0, 0, 0],
-                text: clinic_mobile,
-                style: 'header',
-                alignment: 'center',
-            },
-            {
-                fontSize: 15,
-                margin: [15, 0, 0, 0],
-                text: 'Bill',
-                style: 'header', bold: true,
-                alignment: 'center',
-            },
-            {
-                margin: [15, 0, 0, 0],
+                margin: [15, 25, 0, 0],
                 style: 'tableExample',
                 table: {
                     widths: [100, 150, 100, 150],
                     body: [
-                        [{ text: 'Patient Id', fontSize: 12, font: 'Roboto' },
-                        { text: pateintid, fontSize: 12, font: 'Roboto' },
+                        [{ text: 'UHID', fontSize: 12, font: 'Roboto' },
+                        { text: uhid, fontSize: 12, font: 'Roboto' },
                         { text: 'Bill No', fontSize: 12, font: 'Roboto' },
                         { text: lastVisitId, fontSize: 12, font: 'Roboto' },
                         ],
@@ -213,7 +244,12 @@ export const ProcedureBillPdfView = (pateintid, patient, lastVisitId, dataset, s
 
 
 
-        ]
+        ],
+        // images: {
+        //      snow: 'http://localhost/NAS/ahanex.png',
+        //     // snow: ahanex
+        // }
+
 
 
 

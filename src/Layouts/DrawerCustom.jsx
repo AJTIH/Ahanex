@@ -19,6 +19,7 @@ import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { colors } from '../Constant/Colors';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 
 const DrawerCustom = ({ open, setOpen }) => {
 
@@ -79,10 +80,38 @@ const DrawerCustom = ({ open, setOpen }) => {
                 },
                 {
                     slno: 4,
+                    name: 'Procedure Category',
+                    icon: <OpenInNew fontSize='small' className='text-[#636b74]' />,
+                    navigate: 'ProcedureCategoryMaster'
+                },
+                {
+                    slno: 5,
                     name: 'User Creation',
                     icon: <OpenInNew fontSize='small' className='text-[#636b74]' />,
                     navigate: 'UserCreation'
                 },
+
+            ]
+        },
+
+        {
+            slno: 3,
+            name: 'Report',
+            icon: <SummarizeIcon fontSize='small' className='flex text-[#636b74]' />,
+            submenu: [
+                {
+                    slno: 1,
+                    name: 'Cash Close',
+                    icon: <OpenInNew fontSize='small' className='text-[#636b74]' />,
+                    navigate: 'CashClose'
+                },
+                {
+                    slno: 2,
+                    name: 'Bill Search',
+                    icon: <OpenInNew fontSize='small' className='text-[#636b74]' />,
+                    navigate: 'BillSearch'
+                },
+
             ]
         },
     ]
